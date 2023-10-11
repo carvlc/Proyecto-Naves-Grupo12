@@ -1,6 +1,6 @@
-class Play extends Phaser.Scene {
+class Nivel1 extends Phaser.Scene {
     constructor() {
-        super('Play');
+        super('Nivel1');
         this.vida = 100;
         this.puntaje = 0;
     }
@@ -8,12 +8,12 @@ class Play extends Phaser.Scene {
     preload() {
         this.load.image('sky', '../../public/img/fondo-space-1.PNG')
         this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('red', '/public/img/cyan.png')
+        this.load.image('cyan', '/public/img/cyan.png')
         this.load.image('minicyan', '/public/img/mini-cyan.png')
-        this.load.image('shoot', '/public/img/shoot4.png')
-        this.load.image('shoot2', '/public/img/shoot3.png')
+        this.load.image('shoot4', '/public/img/shoot4.png')
+        this.load.image('shoot3', '/public/img/shoot3.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
-        this.load.spritesheet('nave', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
+        this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
     }
 
     create() {
@@ -22,7 +22,7 @@ class Play extends Phaser.Scene {
         this.bala;
 
         this.add.image(400, 300, 'sky');
-        const particles = this.add.particles(0, 0, 'red', {
+        const particles = this.add.particles(0, 0, 'cyan', {
             speed: 200,
             angle: { min: 170, max: 190 },
             scale: { start: 1, end: 0 },
@@ -30,24 +30,24 @@ class Play extends Phaser.Scene {
         });
 
 
-        this.player = this.physics.add.sprite(100, 200, 'nave');
+        this.player = this.physics.add.sprite(100, 200, 'sega');
         this.player.setCollideWorldBounds(true);
         particles.startFollow(this.player);
 
         // para el movimiento de la nave player
         this.anims.create({
             key: 'turn',
-            frames: [{ key: 'nave', frame: 0 }],
+            frames: [{ key: 'sega', frame: 0 }],
             frameRate: 20
         })
         this.anims.create({
             key: 'up',
-            frames: [{ key: 'nave', frame: 1 }],
+            frames: [{ key: 'sega', frame: 1 }],
             frameRate: 10
         })
         this.anims.create({
             key: 'down',
-            frames: [{ key: 'nave', frame: 2 }],
+            frames: [{ key: 'sega', frame: 2 }],
             frameRate: 10
         })
 
@@ -122,18 +122,20 @@ class Play extends Phaser.Scene {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
         console.log(this.posicionPlayer);
-        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
+        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot4');
         this.bala.body.velocity.x = 400;
+        this.bala.checkWorldBounds= true;
         // this.particles2.startFollow(this.bala);
         this.bala.on('outOfBounds', () => {
             // cuando pipessuperior sale de los limites del mundo, se elimina
             bala.destroy();
+            console.log('se elimina');
         });
         // 
     }
 
     createEnemy() {
-        let enemyOrigenHorizontal = 900;
+        let enemyOrigenHorizontal = 800;
         // let enemyGroup = this.physics.add.group();
         for (let i = 0; i < 1; i++) {
             let enemyOrigenVertical = Phaser.Math.Between(31, 569);
@@ -164,7 +166,7 @@ class Play extends Phaser.Scene {
         this.vidaText.setText('Vida: ' + this.vida + '%');
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
+            this.scene.start('Menu');
             player.setTint(0xff0000)
         }
     }
@@ -177,8 +179,8 @@ class Play extends Phaser.Scene {
         enemy.destroy();
         this.puntajeText.setText("Score: " + this.puntaje + "/150");
         if (this.puntaje == 150) {
-            this.scene.start("Play");
+            this.scene.start('Nivel2');
         }
     }
 }
-export default Play;
+export default Nivel1;

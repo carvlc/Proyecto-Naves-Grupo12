@@ -1,4 +1,7 @@
-import Play from "./escenas/Play.js";
+import Boss from "./escenas/Boss.js";
+import Menu from "./escenas/Menu.js";
+import Nivel1 from "./escenas/Nivel1.js";
+import Nivel2 from "./escenas/Nivel2.js";
 
 let config = {
     type: Phaser.AUTO,
@@ -15,6 +18,6 @@ let config = {
             debug: false
         }
     },
-    scene: [Play]
+    scene: [Menu, Nivel1, Nivel2, Boss]
 };
 let game = new Phaser.Game(config);
