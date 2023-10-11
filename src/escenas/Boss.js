@@ -25,7 +25,7 @@ class Boss extends Phaser.Scene {
 
         this.stars = this.add.blitter(0, 0, 'final');
         this.stars.create(0, 0);
-        this.stars.create(0, -800);
+        this.stars.create(0, -600);
 
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 1);
         this.enemy.setBodySize(160, 64);
@@ -42,9 +42,9 @@ class Boss extends Phaser.Scene {
             repeat: -1
         });
         
-        const particles = this.add.particles(-15, 0, 'red', {
+        const particles = this.add.particles(0, 15, 'red', {
             speed: 50,
-            angle: { min: 90, max: 275 },
+            angle: { min: 45, max: 135 },
             scale: { start: 1, end: 0 },
             blendMode: 'ADD',
 
@@ -56,46 +56,45 @@ class Boss extends Phaser.Scene {
 
             enemy.state -= 1;
             balas.disableBody(true, true);
-            //this.plasma.setSpeedY(0.2 * bullet.body.velocity.y).emitParticleAt(x, y);
 
             if (enemy.state <= 0)
             {
                 enemy.setFrame(3);
                 enemy.body.checkCollision.none = true;
-                this.enemyFiring.remove();
                 this.enemyMoving.stop();
             }
         });
 
         this.player = this.physics.add.sprite(400, 540, 'nave');
         this.player.setCollideWorldBounds(true);
+        this.player.setRotation(4.71239);
         particles.startFollow(this.player);
 
 
         // para el movimiento player
         this.anims.create({
-            key: 'left',
-            frames: [{ key: 'nave', frame: 0 }],
+            key: 'izquierda',
+            frames: [{ key: 'nave', frame: 2 }],
             frameRate: 10
         });
         this.anims.create({
-            key: 'turn',
+            key: 'quieto',
             frames: [{ key: 'nave', frame: 0 }],
             frameRate: 20
         })
         this.anims.create({
-            key: 'right',
+            key: 'derecha',
+            frames: [{ key: 'nave', frame: 1 }],
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'arriba',
             frames: [{ key: 'nave', frame: 0 }],
             frameRate: 10
         })
         this.anims.create({
-            key: 'up',
-            frames: [{ key: 'nave', frame: 2 }],
-            frameRate: 10
-        })
-        this.anims.create({
-            key: 'down',
-            frames: [{ key: 'nave', frame: 1 }],
+            key: 'abajo',
+            frames: [{ key: 'nave', frame: 0 }],
             frameRate: 10
         })
 
@@ -109,28 +108,28 @@ class Boss extends Phaser.Scene {
     update() {
 
         this.stars.y += 1;
-        this.stars.y %= 512;
+        this.stars.y %= 601;
 
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
-            this.player.anims.play('left');
+            this.player.anims.play('izquierda');
         }
         else if (this.cursors.right.isDown) {
             this.player.setVelocityX(400);
-            this.player.anims.play('right');
+            this.player.anims.play('derecha');
         }
         else if (this.cursors.up.isDown) {
             this.player.setVelocityY(-500);
-            this.player.anims.play('up')
+            this.player.anims.play('arriba')
         }
         else if (this.cursors.down.isDown) {
             this.player.setVelocityY(500)
-            this.player.anims.play('down')
+            this.player.anims.play('abajo')
         }
         else {
             this.player.setVelocityY(0);
             this.player.setVelocityX(0);
-            this.player.anims.play('turn', true)
+            this.player.anims.play('quieto', true)
         }
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
@@ -156,8 +155,9 @@ class Boss extends Phaser.Scene {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
         // console.log(this.posicionPlayer);
-        let bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
-        bala.body.velocity.x = 600;
+        let bala = this.balas.create(this.posicionPlayer.x + 35, this.posicionPlayer.y, 'shoot');
+        bala.setRotation(4.71239);
+        bala.body.velocity.y = -600;
         bala.checkWorldBounds= true;
 
         bala.on('outOfBounds', () => {
@@ -169,26 +169,26 @@ class Boss extends Phaser.Scene {
             // this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             // this.physics.add.collider(this.enemy,this.balas,this.hitbullet, null, this);
 
-    hitenemy(player,enemy){
-        console.log("chocaron");
-        // enemy.destroy();
-        this.vida=this.vida-25;
-        this.vidaText.setText("Vida: "+this.vida+"%");     
-        if(this.vida ==0){
-            this.scene.start("Menu");
-            player.setTint(0xff0000);
-        }
-    }
+    // hitenemy(player,enemy){
+    //     console.log("chocaron");
+    //     // enemy.destroy();
+    //     this.vida=this.vida-25;
+    //     this.vidaText.setText("Vida: "+this.vida+"%");     
+    //     if(this.vida ==0){
+    //         this.scene.start("Menu");
+    //         player.setTint(0xff0000);
+    //     }
+    // }
     
-    hitbullet(enemy,bala){
-        console.log("funca");
-        this.score=this.score+10;
-        bala.destroy();
-        // enemy.destroy();
-        this.scoreText.setText("Score: "+this.score+"/150");  
-        if(this.score==150){
-            this.scene.start("Menu");
-        }
-    }
+    // hitbullet(enemy,bala){
+    //     console.log("funca");
+    //     this.score=this.score+10;
+    //     bala.destroy();
+    //     // enemy.destroy();
+    //     this.scoreText.setText("Score: "+this.score+"/150");  
+    //     if(this.score==150){
+    //         this.scene.start("Menu");
+    //     }
+    // }
 }
 export default Boss;

@@ -35,7 +35,7 @@ class Menu extends Phaser.Scene{
                 amount: 40,
                 onComplete: () => {
                     this.cameras.main.fadeOut(100);
-                    this.scene.start('Nivel1');
+                    this.scene.start('Boss');
                 }
             })
         });

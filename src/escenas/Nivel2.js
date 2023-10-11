@@ -37,32 +37,32 @@ class Nivel2 extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         particles.startFollow(this.player);
 
-        // para el movimiento player
-        // this.anims.create({
-        //     key: 'left',
-        //     frames: [{ key: 'nave', frame: 0 }],
-        //     frameRate: 10
-        // });
-        // this.anims.create({
-        //     key: 'turn',
-        //     frames: [{ key: 'nave', frame: 0 }],
-        //     frameRate: 20
-        // })
-        // this.anims.create({
-        //     key: 'right',
-        //     frames: [{ key: 'nave', frame: 0 }],
-        //     frameRate: 10
-        // })
-        // this.anims.create({
-        //     key: 'up',
-        //     frames: [{ key: 'nave', frame: 2 }],
-        //     frameRate: 10
-        // })
-        // this.anims.create({
-        //     key: 'down',
-        //     frames: [{ key: 'nave', frame: 1 }],
-        //     frameRate: 10
-        // })
+        //para el movimiento player
+        this.anims.create({
+            key: 'izquierda',
+            frames: [{ key: 'nave', frame: 0 }],
+            frameRate: 10
+        });
+        this.anims.create({
+            key: 'quieto',
+            frames: [{ key: 'nave', frame: 0 }],
+            frameRate: 20
+        })
+        this.anims.create({
+            key: 'derecha',
+            frames: [{ key: 'nave', frame: 0 }],
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'arriba',
+            frames: [{ key: 'nave', frame: 2 }],
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'abajo',
+            frames: [{ key: 'nave', frame: 1 }],
+            frameRate: 10
+        })
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -85,24 +85,24 @@ class Nivel2 extends Phaser.Scene {
     update() {
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
-            this.player.anims.play('left');
+            this.player.anims.play('izquierda');
         }
         else if (this.cursors.right.isDown) {
             this.player.setVelocityX(400);
-            this.player.anims.play('right');
+            this.player.anims.play('derecha');
         }
         else if (this.cursors.up.isDown) {
             this.player.setVelocityY(-500);
-            this.player.anims.play('up')
+            this.player.anims.play('arriba')
         }
         else if (this.cursors.down.isDown) {
             this.player.setVelocityY(500)
-            this.player.anims.play('down')
+            this.player.anims.play('abajo')
         }
         else {
             this.player.setVelocityY(0);
             this.player.setVelocityX(0);
-            this.player.anims.play('turn', true)
+            this.player.anims.play('quieto', true)
         }
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
@@ -176,7 +176,7 @@ class Nivel2 extends Phaser.Scene {
         bala.destroy();
         enemy.destroy();
         this.scoreText.setText("Score: "+this.score+"/150");  
-        if(this.score==150){
+        if(this.score==250){
             this.scene.start("Boss");
         }
     }
