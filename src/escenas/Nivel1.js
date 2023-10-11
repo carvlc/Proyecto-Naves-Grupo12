@@ -8,12 +8,12 @@ class Nivel1 extends Phaser.Scene {
     preload() {
         this.load.image('sky', '../../public/img/background1.png')
         this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('red', '/public/img/cyan.png')
+        this.load.image('cyan', '/public/img/cyan.png')
         this.load.image('shoot', '/public/img/shoot5.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
         this.load.image('item', '/public/img/shoot4.png')
         this.load.image('pared', '/public/img/pipe.png')
-        this.load.spritesheet('nave', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
+        this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
     }
 
     create() {
@@ -27,7 +27,7 @@ class Nivel1 extends Phaser.Scene {
         this.skyline.create(800, 0);
 
 
-        const particles = this.add.particles(0, 0, 'red', {
+        const particles = this.add.particles(0, 0, 'cyan', {
             speed: 200,
             angle: { min: 170, max: 190 },
             scale: { start: 1, end: 0 },
@@ -41,24 +41,24 @@ class Nivel1 extends Phaser.Scene {
         this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
 
 
-        this.player = this.physics.add.sprite(this.game.config.width / 8, this.game.config.height / 2, 'nave');
+        this.player = this.physics.add.sprite(this.game.config.width / 8, this.game.config.height / 2, 'sega');
         this.player.setCollideWorldBounds(true);
         particles.startFollow(this.player);
 
         // para el movimiento de la nave player (animaciones)
         this.anims.create({
             key: 'turn',
-            frames: [{ key: 'nave', frame: 0 }],
+            frames: [{ key: 'sega', frame: 0 }],
             frameRate: 20
         })
         this.anims.create({
             key: 'up',
-            frames: [{ key: 'nave', frame: 1 }],
+            frames: [{ key: 'sega', frame: 1 }],
             frameRate: 10
         })
         this.anims.create({
             key: 'down',
-            frames: [{ key: 'nave', frame: 2 }],
+            frames: [{ key: 'sega', frame: 2 }],
             frameRate: 10
         })
 
@@ -78,8 +78,6 @@ class Nivel1 extends Phaser.Scene {
         this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
         this.vidaText = this.add.text(16, 16, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
         this.puntajeText = this.add.text(16, 40, 'Puntaje: ' + this.puntaje + '/150', { fontSize: '32px', fill: '#fff' })
-
-
     }
 
     update() {
@@ -113,9 +111,9 @@ class Nivel1 extends Phaser.Scene {
                 this.disparar();
             }
         })
-
         this.physics.add.collider(this.player, this.powerup, this.obtenerPowerup, null, this);
     }
+
 
     recarga() {
         this.reload = false;
@@ -147,8 +145,6 @@ class Nivel1 extends Phaser.Scene {
             this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy, this.balas, this.hitbullet, null, this);
             this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
-
-
         }
     }
 
@@ -201,5 +197,6 @@ class Nivel1 extends Phaser.Scene {
         this.powerup.destroy();
         this.particlesItem.destroy();
     }
+
 }
 export default Nivel1;
