@@ -1,10 +1,11 @@
-import Play from "./escenas/Play.js";
+import GameOver from "./escenas/GameOver.js";
+import Nivel1 from "./escenas/Nivel1.js";
 
 let config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scale:{
+    scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
@@ -15,6 +16,6 @@ let config = {
             debug: false
         }
     },
-    scene: [Play]
+    scene: [Nivel1, GameOver]
 };
 let game = new Phaser.Game(config);
