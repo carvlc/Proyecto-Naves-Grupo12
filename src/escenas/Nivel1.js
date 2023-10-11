@@ -6,22 +6,27 @@ class Nivel1 extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('sky', '../../public/img/fondo-space-1.PNG')
+        this.load.image('sky', '../../public/img/background1.png')
         this.load.image('enemy', '/public/img/enemy.png')
         this.load.image('cyan', '/public/img/cyan.png')
-        this.load.image('minicyan', '/public/img/mini-cyan.png')
-        this.load.image('shoot4', '/public/img/shoot4.png')
-        this.load.image('shoot3', '/public/img/shoot3.png')
+        this.load.image('shoot', '/public/img/shoot5.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
+        this.load.image('item', '/public/img/shoot4.png')
+        this.load.image('pared', '/public/img/pipe.png')
         this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
     }
 
     create() {
+        this.puntaje = 0;
         this.reload = true;
         this.balas = this.physics.add.group();
         this.bala;
 
-        this.add.image(400, 300, 'sky');
+        this.skyline = this.add.blitter(0, 0, 'sky');
+        this.skyline.create(0, 0);
+        this.skyline.create(800, 0);
+
+
         const particles = this.add.particles(0, 0, 'cyan', {
             speed: 200,
             angle: { min: 170, max: 190 },
@@ -30,11 +35,17 @@ class Nivel1 extends Phaser.Scene {
         });
 
 
-        this.player = this.physics.add.sprite(100, 200, 'sega');
+        // se crean paredes para eliminar elementos fuera del mundo
+        this.paredes = this.physics.add.staticGroup();
+        this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
+        this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
+
+
+        this.player = this.physics.add.sprite(this.game.config.width / 8, this.game.config.height / 2, 'sega');
         this.player.setCollideWorldBounds(true);
         particles.startFollow(this.player);
 
-        // para el movimiento de la nave player
+        // para el movimiento de la nave player (animaciones)
         this.anims.create({
             key: 'turn',
             frames: [{ key: 'sega', frame: 0 }],
@@ -64,11 +75,15 @@ class Nivel1 extends Phaser.Scene {
             repeat: -1
         })
 
-        this.vidaText = this.add.text(16, 16, 'vida: 100%', { fontSize: '32px', fill: '#fff' })
-        this.puntajeText = this.add.text(16, 40, 'puntaje: 0', { fontSize: '32px', fill: '#fff' })
+        this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
+        this.vidaText = this.add.text(16, 16, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
+        this.puntajeText = this.add.text(16, 40, 'Puntaje: ' + this.puntaje + '/150', { fontSize: '32px', fill: '#fff' })
     }
 
     update() {
+        this.skyline.x -= 1;
+        this.skyline.x %= -800;
+
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
             this.player.anims.play('turn');
@@ -90,14 +105,16 @@ class Nivel1 extends Phaser.Scene {
             this.player.setVelocityX(0);
             this.player.anims.play('turn', true)
         }
-        // cuando se pulse la tecla 32(espacio) el bird da n salto hacia arriba
+        // cuando se pulse la tecla 32(espacio) la nave dispara
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
             }
         })
-
+        this.physics.add.collider(this.player, this.powerup, this.obtenerPowerup, null, this);
     }
+
+
     recarga() {
         this.reload = false;
         if (!this.addreload) {
@@ -111,53 +128,34 @@ class Nivel1 extends Phaser.Scene {
             })
         }
     }
-    disparar() {
-        // this.particles2 = this.add.particles(0,0,'minicyan',{
-        //     speed: 200,
-        //     angle: { min: 170, max: 190 },
-        //     scale: { start: 1, end: 0 },
-        //     blendMode: 'ADD',
-        // })
 
+    disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        console.log(this.posicionPlayer);
-        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot4');
-        this.bala.body.velocity.x = 400;
-        this.bala.checkWorldBounds= true;
-        // this.particles2.startFollow(this.bala);
-        this.bala.on('outOfBounds', () => {
-            // cuando pipessuperior sale de los limites del mundo, se elimina
-            bala.destroy();
-            console.log('se elimina');
-        });
-        // 
+        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
+        this.bala.body.velocity.x = 800;
     }
 
     createEnemy() {
-        let enemyOrigenHorizontal = 800;
-        // let enemyGroup = this.physics.add.group();
+        let enemyOrigenHorizontal = 750;
         for (let i = 0; i < 1; i++) {
             let enemyOrigenVertical = Phaser.Math.Between(31, 569);
-            // this.enemy = enemyGroup.create(enemyOrigenHorizontal, enemyOrigenVertical, 'enemy');
             this.enemy = this.physics.add.sprite(enemyOrigenHorizontal, enemyOrigenVertical, "enemy");
-
-
-            this.enemy.checkWorldBounds = true;
             this.enemy.body.velocity.x = -200;
-            this.enemy.body.position.x = this.enemy.body.position.x;
-            console.log(this.enemy.body.position.x)
-            // if (this.enemy.body.position.x < 0) {
-            //     console.log('boom!!!!')
-            //     this.enemy.destroy();
-            // }
-            this.enemy.on('outOfBounds', () => {
-                console.log('mensaje')
-                this.enemy.destroy();
-            });
             this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy, this.balas, this.hitbullet, null, this);
+            this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
         }
+    }
+
+    outBullet(balas) {
+        balas.destroy();
+        console.log('se elimino la bala')
+    }
+
+    outEnemy(enemy) {
+        enemy.destroy();
+        console.log('se elimino el enemigo')
     }
 
     hitenemy(player, enemy) {
@@ -166,21 +164,39 @@ class Nivel1 extends Phaser.Scene {
         this.vidaText.setText('Vida: ' + this.vida + '%');
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Menu');
+            this.scene.start('GameOver', { puntaje: this.puntaje });
             player.setTint(0xff0000)
         }
+
     }
 
     hitbullet(enemy, balas) {
         console.log("funca");
         this.puntaje += 10;
         balas.destroy();
-        // this.particles2.destroy();
         enemy.destroy();
-        this.puntajeText.setText("Score: " + this.puntaje + "/150");
-        if (this.puntaje == 150) {
-            this.scene.start('Nivel2');
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/150");
+        if (this.puntaje == 100) {
+            this.scene.start("Nivel2", { puntaje: this.puntaje });
+        }
+        if (this.puntaje == 50) {
+            this.particlesItem = this.add.particles(0, 0, 'item', {
+                speed: 100,
+                scale: { start: 1, end: 0 },
+                blendMode: 'ADD',
+            })
+            this.powerup = this.physics.add.sprite(600, 400, 'item').setVelocity(150, 200).setCollideWorldBounds(true, 1, 1, true).setScale();
+            this.particlesItem.startFollow(this.powerup);
         }
     }
+
+    obtenerPowerup() {
+        console.log('powerup agarrado');
+        this.vida += 100;
+        this.vidaText.setText('Vida: ' + this.vida + '%');
+        this.powerup.destroy();
+        this.particlesItem.destroy();
+    }
+
 }
 export default Nivel1;
