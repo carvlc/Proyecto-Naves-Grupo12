@@ -1,3 +1,6 @@
+import Boss from "./escenas/Boss2.js";
+import Nivel3 from "./escenas/Nivel3.js";
+import Nivel2 from "./escenas/Nivel3.js";
 import Play from "./escenas/Play.js";
 
 let config = {
@@ -15,6 +18,6 @@ let config = {
             debug: false
         }
     },
-    scene: [Play]
+    scene: [Nivel3,Play]
 };
 let game = new Phaser.Game(config);

@@ -17,6 +17,7 @@ class Play extends Phaser.Scene {
     }
 
     create() {
+        
         this.reload = true;
         this.balas = this.physics.add.group();
         this.bala;
@@ -69,6 +70,7 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+        this.hitCheck=true;
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
             this.player.anims.play('turn');
@@ -153,7 +155,9 @@ class Play extends Phaser.Scene {
                 console.log('mensaje')
                 this.enemy.destroy();
             });
-            this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
+        
+                this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
+                      
             this.physics.add.collider(this.enemy, this.balas, this.hitbullet, null, this);
         }
     }
@@ -162,13 +166,22 @@ class Play extends Phaser.Scene {
         enemy.destroy();
         this.vida -= 25;
         this.vidaText.setText('Vida: ' + this.vida + '%');
+        player.setTint(0xff0304);
+        this.time.addEvent({
+            delay: 400,
+            callbackScope: this,
+            callback:function(){
+                player.setTint();
+            }
+        
+        })
         if (this.vida == 0) {
             this.vida = 100;
             this.scene.start('Play');
-            player.setTint(0xff0000)
+           
         }
     }
-
+  
     hitbullet(enemy, balas) {
         console.log("funca");
         this.puntaje += 10;
@@ -177,7 +190,7 @@ class Play extends Phaser.Scene {
         enemy.destroy();
         this.puntajeText.setText("Score: " + this.puntaje + "/150");
         if (this.puntaje == 150) {
-            this.scene.start("Play");
+            this.scene.start("Nivel2");
         }
     }
 }
