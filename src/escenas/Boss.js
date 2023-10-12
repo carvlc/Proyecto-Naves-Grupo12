@@ -3,9 +3,12 @@ class Boss extends Phaser.Scene {
         super('Boss');
         this.scoreText="";
         this.vida=0;
-        this.score=0;
+        this.puntaje=0;
     }
-
+    init(data){
+        this.puntaje = data.puntaje;
+        this.vida = data.vida;
+    }
     preload() {
         this.load.image('final', '../../public/img/fondo5.png')
         this.load.spritesheet('boss', '/public/img/buster.png', { frameWidth: 96, frameHeight: 112 })
@@ -16,8 +19,6 @@ class Boss extends Phaser.Scene {
     }
 
     create() {
-        this.vida=100;
-        this.score=0;
         this.reload = true;
         this.balas = this.physics.add.group();
         this.bala;
@@ -100,8 +101,8 @@ class Boss extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys();
  
-        this.scoreText = this.add.text(16, 16, 'Score: 0/150', { fontSize: '32px', fill: '#FFFFFF' });
-        this.vidaText = this.add.text(16, 50, "vida: 100%", { fontSize: '32px', fill: '#FFFFFF' });
+        this.scoreText = this.add.text(16, 16, 'Score: ' + this.puntaje, { fontSize: '32px', fill: '#FFFFFF' });
+        this.vidaText = this.add.text(16, 50, "vida: " + this.vida + '%', { fontSize: '32px', fill: '#FFFFFF' });
 
     }
 
@@ -182,11 +183,11 @@ class Boss extends Phaser.Scene {
     
     // hitbullet(enemy,bala){
     //     console.log("funca");
-    //     this.score=this.score+10;
+    //     this.puntaje=this.puntaje+10;
     //     bala.destroy();
     //     // enemy.destroy();
-    //     this.scoreText.setText("Score: "+this.score+"/150");  
-    //     if(this.score==150){
+    //     this.scoreText.setText("Score: "+this.puntaje+"/150");  
+    //     if(this.puntaje==150){
     //         this.scene.start("Menu");
     //     }
     // }

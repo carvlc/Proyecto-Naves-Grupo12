@@ -18,6 +18,7 @@ class Nivel1 extends Phaser.Scene {
 
     create() {
         this.puntaje = 0;
+        this.vida = 100;
         this.reload = true;
         this.balas = this.physics.add.group();
         this.bala;
@@ -76,8 +77,9 @@ class Nivel1 extends Phaser.Scene {
         })
 
         this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
-        this.vidaText = this.add.text(16, 16, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
-        this.puntajeText = this.add.text(16, 40, 'Puntaje: ' + this.puntaje + '/150', { fontSize: '32px', fill: '#fff' })
+        this.puntajeText = this.add.text(16, 16, 'Puntaje: ' + this.puntaje + '/100', { fontSize: '32px', fill: '#fff' })
+        this.vidaText = this.add.text(16, 50, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
+
     }
 
     update() {
@@ -175,9 +177,9 @@ class Nivel1 extends Phaser.Scene {
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
-        this.puntajeText.setText("Puntaje: " + this.puntaje + "/150");
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/100");
         if (this.puntaje == 100) {
-            this.scene.start("Nivel2", { puntaje: this.puntaje });
+            this.scene.start("Nivel2", { puntaje: this.puntaje , vida: this.vida});
         }
         if (this.puntaje == 50) {
             this.particlesItem = this.add.particles(0, 0, 'item', {
