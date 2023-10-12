@@ -3,9 +3,12 @@ class Nivel2 extends Phaser.Scene {
         super('Nivel2');
         this.scoreText="";
         this.vida=0;
-        this.score=0;
+        this.puntaje=0;
     }
-
+    init(data){
+        this.puntaje = data.puntaje;
+        this.vida = data.vida;
+    }
     preload() {
         this.load.image('space', '../../public/img/space3.png')
         this.load.image('enemy', '/public/img/enemy.png')
@@ -16,8 +19,6 @@ class Nivel2 extends Phaser.Scene {
     }
 
     create() {
-        this.vida=100;
-        this.score=0;
         this.reload = true;
         this.balas = this.physics.add.group();
         this.bala;
@@ -77,8 +78,8 @@ class Nivel2 extends Phaser.Scene {
         })
 
         
-        this.scoreText = this.add.text(16, 16, 'Score: 0/150', { fontSize: '32px', fill: '#FFFFFF' });
-        this.vidaText = this.add.text(16, 50, "vida: 100%", { fontSize: '32px', fill: '#FFFFFF' });
+        this.scoreText = this.add.text(16, 16, 'Puntaje: ' + this.puntaje + '/250', { fontSize: '32px', fill: '#FFFFFF' });
+        this.vidaText = this.add.text(16, 50, "Vida: " + this.vida + '%', { fontSize: '32px', fill: '#FFFFFF' });
 
     }
 
@@ -160,7 +161,7 @@ class Nivel2 extends Phaser.Scene {
         this.vida=this.vida-25;
         this.vidaText.setText("Vida: "+this.vida+"%");     
         if(this.vida ==0){
-            this.scene.start("Menu");
+            this.scene.start("GameOver",{puntaje: this.puntaje});
             player.setTint(0xff0000);
         }
     }
@@ -169,9 +170,9 @@ class Nivel2 extends Phaser.Scene {
         this.score=this.score+10;
         bala.destroy();
         enemy.destroy();
-        this.scoreText.setText("Score: "+this.score+"/150");  
-        if(this.score==250){
-            this.scene.start("Boss");
+        this.scoreText.setText("Puntaje: "+this.puntaje+"/250");  
+        if(this.puntaje==250){
+            this.scene.start("Boss",{puntaje: this.puntaje, vida: this.vida});
         }
     }
 }
