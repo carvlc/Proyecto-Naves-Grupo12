@@ -130,7 +130,7 @@ class Nivel1 extends Phaser.Scene {
             })
         }
     }
-
+  
     disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
@@ -173,7 +173,7 @@ class Nivel1 extends Phaser.Scene {
     }
 
     hitbullet(enemy, balas) {
-        console.log("funca");
+        // console.log("funca");
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();

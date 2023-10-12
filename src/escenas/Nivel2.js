@@ -125,10 +125,8 @@ class Nivel2 extends Phaser.Scene {
         }
     }
     disparar() {
-        // console.log('dispara');
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        // console.log(this.posicionPlayer);
         let bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         bala.body.velocity.x = 600;
         bala.checkWorldBounds= true;
@@ -142,14 +140,12 @@ class Nivel2 extends Phaser.Scene {
     createEnemy() {
     
         let enemyDistanciaHorizontal = 800;
-        // let enemySuperiorGroup = this.physics.add.group();
-       
+
         for (let i = 0; i < 1; i++) {
             let enemyPosicionAltura = Phaser.Math.Between(31, 569);
             this.enemy = this.physics.add.sprite(enemyDistanciaHorizontal, enemyPosicionAltura, 'enemy');
             this.enemy.body.velocity.x = -200;
             this.enemy.checkWorldBounds= true;
-            console.log(this.enemy.body.position);
 
             if(this.enemy.body.position.x<0){
                 console.log("boooooooom")
@@ -161,7 +157,6 @@ class Nivel2 extends Phaser.Scene {
     }
 
     hitenemy(player,enemy){
-        console.log("chocaron");
         enemy.destroy();
         this.vida=this.vida-25;
         this.vidaText.setText("Vida: "+this.vida+"%");     
@@ -172,8 +167,7 @@ class Nivel2 extends Phaser.Scene {
     }
     
     hitbullet(enemy,bala){
-        console.log("funca");
-        this.puntaje=this.puntaje+10;
+        this.score=this.score+10;
         bala.destroy();
         enemy.destroy();
         this.scoreText.setText("Puntaje: "+this.puntaje+"/250");  
