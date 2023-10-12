@@ -112,45 +112,30 @@ class Nivel1 extends Phaser.Scene {
         }
     }
     disparar() {
-        // this.particles2 = this.add.particles(0,0,'minicyan',{
-        //     speed: 200,
-        //     angle: { min: 170, max: 190 },
-        //     scale: { start: 1, end: 0 },
-        //     blendMode: 'ADD',
-        // })
 
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        console.log(this.posicionPlayer);
         this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot4');
         this.bala.body.velocity.x = 400;
         this.bala.checkWorldBounds= true;
-        // this.particles2.startFollow(this.bala);
+
         this.bala.on('outOfBounds', () => {
-            // cuando pipessuperior sale de los limites del mundo, se elimina
             bala.destroy();
             console.log('se elimina');
         });
-        // 
     }
 
     createEnemy() {
         let enemyOrigenHorizontal = 800;
-        // let enemyGroup = this.physics.add.group();
         for (let i = 0; i < 1; i++) {
             let enemyOrigenVertical = Phaser.Math.Between(31, 569);
-            // this.enemy = enemyGroup.create(enemyOrigenHorizontal, enemyOrigenVertical, 'enemy');
             this.enemy = this.physics.add.sprite(enemyOrigenHorizontal, enemyOrigenVertical, "enemy");
 
 
             this.enemy.checkWorldBounds = true;
             this.enemy.body.velocity.x = -200;
             this.enemy.body.position.x = this.enemy.body.position.x;
-            console.log(this.enemy.body.position.x)
-            // if (this.enemy.body.position.x < 0) {
-            //     console.log('boom!!!!')
-            //     this.enemy.destroy();
-            // }
+
             this.enemy.on('outOfBounds', () => {
                 console.log('mensaje')
                 this.enemy.destroy();
@@ -172,10 +157,9 @@ class Nivel1 extends Phaser.Scene {
     }
 
     hitbullet(enemy, balas) {
-        console.log("funca");
+        // console.log("funca");
         this.puntaje += 10;
         balas.destroy();
-        // this.particles2.destroy();
         enemy.destroy();
         this.puntajeText.setText("Score: " + this.puntaje + "/150");
         if (this.puntaje == 150) {

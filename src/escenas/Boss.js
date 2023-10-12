@@ -28,6 +28,7 @@ class Boss extends Phaser.Scene {
         this.stars.create(0, -600);
 
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 1);
+        // this.enemy.anims.play('bossAnimation');
         this.enemy.setBodySize(160, 64);
         this.enemy.state=10;
 
@@ -52,16 +53,17 @@ class Boss extends Phaser.Scene {
 
         this.physics.add.overlap(this.enemy, this.balas, (enemy, balas) =>
         {
-            const { x, y } = balas.body.center;
+            // const { x, y } = balas.body.center;
 
             enemy.state -= 1;
             balas.disableBody(true, true);
 
             if (enemy.state <= 0)
             {
-                enemy.setFrame(3);
+                enemy.setFrame(6);
                 enemy.body.checkCollision.none = true;
                 this.enemyMoving.stop();
+                this.enemy.stop();
             }
         });
 
@@ -73,30 +75,38 @@ class Boss extends Phaser.Scene {
 
         // para el movimiento player
         this.anims.create({
-            key: 'izquierda',
+            key: 'izquierda1',
             frames: [{ key: 'nave', frame: 2 }],
             frameRate: 10
         });
         this.anims.create({
-            key: 'quieto',
+            key: 'quieto1',
             frames: [{ key: 'nave', frame: 0 }],
             frameRate: 20
         })
         this.anims.create({
-            key: 'derecha',
+            key: 'derecha1',
             frames: [{ key: 'nave', frame: 1 }],
             frameRate: 10
         })
         this.anims.create({
-            key: 'arriba',
+            key: 'arriba1',
             frames: [{ key: 'nave', frame: 0 }],
             frameRate: 10
         })
         this.anims.create({
-            key: 'abajo',
+            key: 'abajo1',
             frames: [{ key: 'nave', frame: 0 }],
             frameRate: 10
         })
+
+        this.anims.create({
+            key: 'bossAnimacion',
+            frames: this.anims.generateFrameNames('boss', {star: 0, end:5}),
+            frameRate: 10,
+        })
+
+        this.enemy.play({key:'bossAnimacion', repeat: -1});
 
         this.cursors = this.input.keyboard.createCursorKeys();
  
@@ -108,28 +118,28 @@ class Boss extends Phaser.Scene {
     update() {
 
         this.stars.y += 1;
-        this.stars.y %= 601;
+        this.stars.y %= 600;
 
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
-            this.player.anims.play('izquierda');
+            this.player.anims.play('izquierda1');
         }
         else if (this.cursors.right.isDown) {
             this.player.setVelocityX(400);
-            this.player.anims.play('derecha');
+            this.player.anims.play('derecha1');
         }
         else if (this.cursors.up.isDown) {
             this.player.setVelocityY(-500);
-            this.player.anims.play('arriba')
+            this.player.anims.play('arriba1')
         }
         else if (this.cursors.down.isDown) {
             this.player.setVelocityY(500)
-            this.player.anims.play('abajo')
+            this.player.anims.play('abajo1')
         }
         else {
             this.player.setVelocityY(0);
             this.player.setVelocityX(0);
-            this.player.anims.play('quieto', true)
+            this.player.anims.play('quieto1', true)
         }
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
@@ -151,10 +161,8 @@ class Boss extends Phaser.Scene {
         }
     }
     disparar() {
-        // console.log('dispara');
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        // console.log(this.posicionPlayer);
         let bala = this.balas.create(this.posicionPlayer.x + 35, this.posicionPlayer.y, 'shoot');
         bala.setRotation(4.71239);
         bala.body.velocity.y = -600;
@@ -169,26 +177,5 @@ class Boss extends Phaser.Scene {
             // this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             // this.physics.add.collider(this.enemy,this.balas,this.hitbullet, null, this);
 
-    // hitenemy(player,enemy){
-    //     console.log("chocaron");
-    //     // enemy.destroy();
-    //     this.vida=this.vida-25;
-    //     this.vidaText.setText("Vida: "+this.vida+"%");     
-    //     if(this.vida ==0){
-    //         this.scene.start("Menu");
-    //         player.setTint(0xff0000);
-    //     }
-    // }
-    
-    // hitbullet(enemy,bala){
-    //     console.log("funca");
-    //     this.score=this.score+10;
-    //     bala.destroy();
-    //     // enemy.destroy();
-    //     this.scoreText.setText("Score: "+this.score+"/150");  
-    //     if(this.score==150){
-    //         this.scene.start("Menu");
-    //     }
-    // }
 }
 export default Boss;
