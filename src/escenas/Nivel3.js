@@ -1,40 +1,59 @@
 class Nivel3 extends Phaser.Scene {
     constructor() {
-        super('Nivel2');
+        super('Nivel3');
         this.vida = 100;
         this.puntaje = 0;
     }
+    init(data) {
+        this.puntaje = data.puntaje;
+        this.vida = data.vida;
+    }
     preload() {
-        this.load.image('sky', '../../public/img/fondo-space-1.PNG')
+        this.load.image('space2', '../../public/img/fondo-space-1.PNG')
         this.load.image('enemy', '/public/img/enemy.png')
         this.load.image('red', '/public/img/cyan.png')
         this.load.image('minicyan', '/public/img/mini-cyan.png')
         this.load.image('shoot', '/public/img/shoot4.png')
         this.load.image('shoot2', '/public/img/shoot3.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
+        this.load.image('pared', '/public/img/pipe.png')
+        this.load.image('white','/public/img/white.png')
         this.load.spritesheet('nave', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
     }
 
     create() {
-        this.healCount=0;
+        this.healCount = 0;
         this.reload = true;
         this.reloadEnemy = true;
         this.balas = this.physics.add.group();
         this.balasEnemy = this.physics.add.group();
         this.bala;
 
-        this.add.image(400, 300, 'sky');
-        const particles = this.add.particles(0, 0, 'red', {
-            speed: 200,
-            angle: { min: 170, max: 190 },
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD',
+        this.skyline = this.add.blitter(0, 0, 'space2');
+        this.skyline.create(0, 0);
+        this.skyline.create(800, 0);
+
+        this.flame = this.add.particles(0, 0, 'white',
+        {
+            // frame: 'white',
+            color: [ 0x96e0da, 0x937ef3 ],
+            colorEase: 'quad.out',
+            lifespan: 1000,
+            angle: { min: 175, max: 185 },
+            scale: { start: 0.40, end: 0, ease: 'sine.out' },
+            speed: 220,
+            advance: 2000,
+            blendMode: 'ADD'
         });
 
+        // se crean paredes para eliminar elementos fuera del mundo
+        this.paredes = this.physics.add.staticGroup();
+        this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
+        this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
 
         this.player = this.physics.add.sprite(100, 200, 'nave');
         this.player.setCollideWorldBounds(true);
-        particles.startFollow(this.player);
+        this.flame.startFollow(this.player,-25,0);
 
         // para el movimiento de la nave player
         this.anims.create({
@@ -60,31 +79,34 @@ class Nivel3 extends Phaser.Scene {
         this.createEnemy();
         this.time.addEvent({
             delay: 400,
-            callback:  this.createEnemy,
+            callback: this.createEnemy,
             callbackScope: this,
             repeat: -1
         })
         this.createShooter();
         this.time.addEvent({
             delay: 1500,
-            callback:  this.createShooter,
+            callback: this.createShooter,
             callbackScope: this,
             repeat: -1
         })
         this.time.addEvent({
             delay: 5000,
-            callback:  this.createHealer,
+            callback: this.createHealer,
             callbackScope: this,
             repeat: -1
         })
 
-        this.vidaText = this.add.text(16, 16, 'vida: 100%', { fontSize: '32px', fill: '#fff' })
-        this.puntajeText = this.add.text(16, 40, 'puntaje: 0/1000', { fontSize: '32px', fill: '#fff' })
+        this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
+        this.puntajeText = this.add.text(16, 40, 'Puntaje: ' + this.puntaje + '/1000', { fontSize: '32px', fill: '#fff' })
+        this.vidaText = this.add.text(16, 16, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
     }
 
     update() {
-     
-        this.hitCheck=true;
+        this.skyline.x -= 1;
+        this.skyline.x %= -800;
+
+        this.hitCheck = true;
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
             this.player.anims.play('turn');
@@ -113,7 +135,7 @@ class Nivel3 extends Phaser.Scene {
             }
         })
     }
-   
+
     recarga() {
         this.reload = false;
         if (!this.addreload) {
@@ -131,108 +153,119 @@ class Nivel3 extends Phaser.Scene {
     disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        console.log(this.posicionPlayer);
+        // console.log(this.posicionPlayer);
         this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         this.bala.body.velocity.x = 400;
-  
+
     }
- 
-  
+
+
     createEnemy() {
         let enemyOrigenHorizontal = 900;
-         
-      
-        // let enemyGroup = this.physics.add.group();
         for (let i = 0; i < 1; i++) {
             let enemyOrigenVertical = Phaser.Math.Between(31, 569);
 
-            this.enemy = this.physics.add.sprite(enemyOrigenHorizontal, enemyOrigenVertical, "enemy");            
+            this.enemy = this.physics.add.sprite(enemyOrigenHorizontal, enemyOrigenVertical, "enemy");
             this.enemy.checkWorldBounds = true;
             this.enemy.body.velocity.x = -300;
             this.enemy.body.position.x = this.enemy.body.position.x;
-            console.log(this.enemy.body.position.x)
-     
-            this.enemy.on('outOfBounds', () => {
-                console.log('mensaje')
-                this.enemy.destroy();
-            });
-        
-            this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);         
+            this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy, this.balas, this.hitbullet, null, this);
+            this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
         }
     }
-    createHealer(){
+
+    outBullet(balas) {
+        balas.destroy();
+        console.log('se elimino la bala')
+    }
+
+    outEnemy(enemy) {
+        enemy.destroy();
+        console.log('se elimino el enemigo')
+    }
+
+    outHealer(healer) {
+        healer.destroy();
+        console.log('se alimino el healer')
+    }
+    outShooter(healer) {
+        healer.destroy();
+        console.log('se alimino el shooter')
+    }
+
+    createHealer() {
         let healerOrigenHorizontal = 900;
 
         for (let i = 0; i < 1; i++) {
             let healerOrigenVertical = Phaser.Math.Between(31, 569);
 
-            this.healer = this.physics.add.sprite(healerOrigenHorizontal, healerOrigenVertical, "enemy"); 
-            this.healer.setTint(0x90ee90);           
+            this.healer = this.physics.add.sprite(healerOrigenHorizontal, healerOrigenVertical, "enemy");
+            this.healer.setTint(0x90ee90);
             this.healer.checkWorldBounds = true;
             this.healer.body.velocity.x = -300;
-            this.healer.body.position.x = this.healer.body.position.x;
-            console.log(this.healer.body.position.x)
 
             this.physics.add.collider(this.healer, this.balas, this.heal, null, this);
+            this.physics.add.collider(this.healer, this.paredes, this.outHealer, null, this);
+
         }
     }
     // se crea nave que dispara
-    createShooter(){
+    createShooter() {
         let shooterOrigenHorizontal = 900;
         // let shooterGroup = this.physics.add.group();
         for (let i = 0; i < 2; i++) {
             let shooterOrigenVertical = Phaser.Math.Between(31, 569);
 
-            this.shooter = this.physics.add.sprite(shooterOrigenHorizontal, shooterOrigenVertical, "enemy");            
+            this.shooter = this.physics.add.sprite(shooterOrigenHorizontal, shooterOrigenVertical, "enemy");
             this.shooter.setTint(0xff0075);
             this.shooter.body.velocity.x = -200;
-            this.shooter.body.position.x = this.shooter.body.position.x;
-            this.shooter.checkWorldBounds = true;
             this.enemyShoot();
-      
-                this.physics.add.overlap(this.player, this.shooter, this.hitShooter, null, this);
-                this.physics.add.overlap(this.balas, this.balasEnemy, this.collideBullet, null, this);      
-                this.physics.add.overlap(this.player, this.balasEnemy, this.hitenemyBullet, null, this);      
-                this.physics.add.collider(this.shooter, this.balas, this.shootShooter, null, this);
+
+            this.physics.add.overlap(this.player, this.shooter, this.hitShooter, null, this);
+            this.physics.add.overlap(this.balas, this.balasEnemy, this.collideBullet, null, this);
+            this.physics.add.overlap(this.player, this.balasEnemy, this.hitenemyBullet, null, this);
+            this.physics.add.collider(this.shooter, this.balas, this.shootShooter, null, this);
+            this.physics.add.collider(this.shooter, this.paredes, this.outShooter, null, this);
+
         }
     }
-       //disparos del enemigo
-       enemyShoot(){
+    //disparos del enemigo
+    enemyShoot() {
 
         this.posicionShooter = this.shooter.body.position;
-        console.log(this.posicionShooter);
-        this.balaenEmigo = this.balasEnemy.create(this.posicionShooter.x -10, this.posicionShooter.y +31 , 'shoot2');
-        this.balaenEmigo.body.velocity.x =-300;
+        // console.log(this.posicionShooter);
+        this.balaenEmigo = this.balasEnemy.create(this.posicionShooter.x - 10, this.posicionShooter.y + 31, 'shoot2');
+        this.balaenEmigo.body.velocity.x = -300;
     }
 
-    
+
     // colisiones
-    heal(balas,healer){
+    heal(balas, healer) {
         balas.destroy();
         healer.destroy();
-        if(this.vida <100)
-        {    
+        if (this.vida < 100) {
             console.log("te curaste boludo qliao")
-        this.healCount+=1;
-        console.log(this.healCount)
-        this.vida=100;
-        this.vidaText.setText('Vida: ' + this.vida + '%');
-        this.player.setTint(0x90ee90);
-        this.time.addEvent({
-            delay: 400,
-            callbackScope: this,
-            callback:function(){
-                this.player.setTint();
-            }
-        
-        })}
+            this.healCount += 1;
+            console.log(this.healCount)
+            this.vida = 100;
+            this.vidaText.setText('Vida: ' + this.vida + '%');
+            this.player.setTint(0x90ee90);
+            this.time.addEvent({
+                delay: 400,
+                callbackScope: this,
+                callback: function () {
+                    this.player.setTint();
+                }
+
+            })
+        }
     }
-    collideBullet(balas,balasEnemy){
+    collideBullet(balas, balasEnemy) {
         balasEnemy.destroy();
         balas.destroy();
-    }  
-    hitShooter(player,shooter){
+    }
+    hitShooter(player, shooter) {
         shooter.destroy();
         this.vida -= 25;
         this.vidaText.setText('Vida: ' + this.vida + '%');
@@ -240,19 +273,19 @@ class Nivel3 extends Phaser.Scene {
         this.time.addEvent({
             delay: 400,
             callbackScope: this,
-            callback:function(){
+            callback: function () {
                 player.setTint();
             }
-        
+
         })
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
-           
+            this.scene.start('GameOver', { puntaje: this.puntaje });
+
         }
     }
-    
-    hitenemy(player,enemy) {
+
+    hitenemy(player, enemy) {
         enemy.destroy();
         this.vida -= 25;
         this.vidaText.setText('Vida: ' + this.vida + '%');
@@ -260,18 +293,18 @@ class Nivel3 extends Phaser.Scene {
         this.time.addEvent({
             delay: 400,
             callbackScope: this,
-            callback:function(){
+            callback: function () {
                 player.setTint();
             }
-        
+
         })
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
-           
+            this.scene.start('GameOver', { puntaje: this.puntaje });
+
         }
     }
-    
+
     hitenemyBullet(player, balasEnemy) {
         balasEnemy.destroy();
         this.vida -= 25;
@@ -280,40 +313,36 @@ class Nivel3 extends Phaser.Scene {
         this.time.addEvent({
             delay: 400,
             callbackScope: this,
-            callback:function(){
+            callback: function () {
                 player.setTint();
             }
-        
+
         })
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
-           
+            this.scene.start('GameOver', { puntaje: this.puntaje });
+
         }
     }
-  
-    hitbullet(enemy,balas) {
-        console.log("funca");
+
+    hitbullet(enemy, balas) {
         this.puntaje += 10;
         balas.destroy();
-        // this.particles2.destroy();
         enemy.destroy();
-        this.puntajeText.setText("Score: " + this.puntaje + "/1000");
-        if (this.puntaje >= 700 ) {
-            this.scene.start('Play');
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/1000");
+        if (this.puntaje >= 1000) {
+            this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
         }
     }
-    
-    shootShooter(shooter,balas) {
-        console.log("funca");
+
+    shootShooter(shooter, balas) {
         this.puntaje += 20;
         balas.destroy();
-        // this.particles2.destroy();
         shooter.destroy();
-        this.puntajeText.setText("Score: " + this.puntaje + "/1000");
-        if (this.puntaje >= 700 ) {
-            this.scene.start('Play');
-         }
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/1000");
+        if (this.puntaje >= 1000) {
+            this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
+        }
     }
 }
 export default Nivel3;
