@@ -10,7 +10,7 @@ class Boss extends Phaser.Scene {
         this.vida = data.vida;
     }
     preload() {
-        this.load.image('final', '../../public/img/fondo5.png')
+        this.load.image('final', '../../public/img/fondo-space-1.PNG')
         this.load.spritesheet('boss', '/public/img/buster.png', { frameWidth: 96, frameHeight: 112 })
         this.load.image('red', '/public/img/red.png')
         this.load.image('shoot', '/public/img/shoot.png')
@@ -23,9 +23,10 @@ class Boss extends Phaser.Scene {
         this.reload = true;
         this.balas = this.physics.add.group();
         this.disparosBoss=this.physics.add.group();
-        this.stars = this.add.blitter(0, 0, 'final');
-        this.stars.create(0, 0);
-        this.stars.create(0, -600);
+        this.skyline = this.add.blitter(0, 0, 'final');
+        this.skyline.create(0, 0);
+        this.skyline.create(0, -800);
+
 
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 1);
         // this.enemy.anims.play('bossAnimation');
@@ -75,7 +76,8 @@ class Boss extends Phaser.Scene {
         this.physics.add.overlap(this.enemy, this.balas, (enemy, balas) =>
         {
             // const { x, y } = balas.body.center;
-
+            this.puntaje += 10;
+            this.scoreText.setText('Puntaje: ' + this.puntaje)
             enemy.state -= 1;
             balas.disableBody(true, true);
 
@@ -139,8 +141,8 @@ class Boss extends Phaser.Scene {
 
     update() {
 
-        this.stars.y += 1;
-        this.stars.y %= 600;
+        this.skyline.y += 1;
+        this.skyline.y %= 800;
 
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
