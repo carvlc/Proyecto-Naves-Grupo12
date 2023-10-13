@@ -4,6 +4,7 @@ import Boss from "./escenas/Boss.js";
 import Menu from "./escenas/Menu.js";
 import Nivel1 from "./escenas/Nivel1.js";
 import Nivel2 from "./escenas/Nivel2.js";
+import Nivel3 from "./escenas/Nivel3.js";
 
 
 let config = {
@@ -22,6 +23,6 @@ let config = {
         }
     },
 
-    scene: [Menu, Nivel1, Nivel2, Boss, GameOver]
+    scene: [Menu, Nivel1, Nivel2,Nivel3,Boss, GameOver]
 };
 let game = new Phaser.Game(config);
