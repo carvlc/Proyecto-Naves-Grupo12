@@ -156,7 +156,6 @@ class Nivel3 extends Phaser.Scene {
         // console.log(this.posicionPlayer);
         this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         this.bala.body.velocity.x = 400;
-
     }
 
 
@@ -281,7 +280,6 @@ class Nivel3 extends Phaser.Scene {
         if (this.vida == 0) {
             this.vida = 100;
             this.scene.start('GameOver', { puntaje: this.puntaje });
-
         }
     }
 
@@ -301,7 +299,6 @@ class Nivel3 extends Phaser.Scene {
         if (this.vida == 0) {
             this.vida = 100;
             this.scene.start('GameOver', { puntaje: this.puntaje });
-
         }
     }
 
@@ -321,7 +318,6 @@ class Nivel3 extends Phaser.Scene {
         if (this.vida == 0) {
             this.vida = 100;
             this.scene.start('GameOver', { puntaje: this.puntaje });
-
         }
     }
 

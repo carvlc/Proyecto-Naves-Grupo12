@@ -15,17 +15,18 @@ class Boss extends Phaser.Scene {
         this.load.image('red', '/public/img/red.png')
         this.load.image('shoot', '/public/img/shoot.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
+        this.load.image("bossShot","/public/img/shootBoss.png")
         this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
     }
 
     create() {
         this.reload = true;
         this.balas = this.physics.add.group();
-        this.bala;
-
+        this.disparosBoss=this.physics.add.group();
         this.skyline = this.add.blitter(0, 0, 'final');
         this.skyline.create(0, 0);
         this.skyline.create(0, -800);
+
 
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 1);
         // this.enemy.anims.play('bossAnimation');
@@ -50,7 +51,28 @@ class Boss extends Phaser.Scene {
             blendMode: 'ADD',
 
         });
+        this.time.addEvent({
+            delay: 1000,
+            callback:  this.bossLoad,
+            callbackScope: this,
+            repeat: -1
+        })
+       
+        this.time.addEvent({
+            delay: 2000,
+            callback:this.bossShot,
+            callbackScope: this,
+            repeat: -1
+        })
 
+        //this.physics.add.overlap(this.player,this.disparosBoss,this.bossBullet,null,this);
+        this.physics.add.overlap(this.disparosBoss,this.player, (disparosBoss,player) =>
+        {
+            // const { x, y } = balas.body.center;
+            disparosBoss.destroy();
+            console.log("auchie auch");
+      
+        });
         this.physics.add.overlap(this.enemy, this.balas, (enemy, balas) =>
         {
             // const { x, y } = balas.body.center;
@@ -67,11 +89,12 @@ class Boss extends Phaser.Scene {
                 this.enemy.stop();
             }
         });
-
+   
         this.player = this.physics.add.sprite(400, 540, 'nave');
         this.player.setCollideWorldBounds(true);
         this.player.setRotation(4.71239);
         particles.startFollow(this.player);
+    
 
 
         // para el movimiento player
@@ -173,6 +196,28 @@ class Boss extends Phaser.Scene {
             bala.destroy();
             console.log('se elimina');
         });
+    }
+    bossLoad(){
+        this.loadAtack = this.add.particles(0, 15, 'red', {
+            speed: 50,
+            angle: { min: 45, max: 135 },
+            scale: { start: 1, end: 0 },
+            blendMode: 'ADD',
+
+        });
+        this.loadAtack.startFollow(this.enemy);
+    }
+    bossShot(){
+       
+        this.posicionEnemy = this.enemy.body.position;
+        this.disparoBoss = this.disparosBoss.create(this.posicionEnemy.x +80 , this.posicionEnemy.y +120, 'bossShot');
+        this.disparoBoss.body.velocity.y = +600;
+        this.disparoBoss.checkWorldBounds= true;
+        this.loadAtack.destroy();
+    }
+    bossBullet(disparosBoss,player){
+        disparosBoss.destroy();
+        console.log("auchie auch");
     }
 
             // this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
