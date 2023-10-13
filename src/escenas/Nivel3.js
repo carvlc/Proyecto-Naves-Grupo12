@@ -1,6 +1,6 @@
 class Nivel3 extends Phaser.Scene {
     constructor() {
-        super('Nivel2');
+        super('Nivel3');
         this.vida = 100;
         this.puntaje = 0;
     }
@@ -134,14 +134,12 @@ class Nivel3 extends Phaser.Scene {
         console.log(this.posicionPlayer);
         this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         this.bala.body.velocity.x = 400;
-  
     }
  
   
     createEnemy() {
         let enemyOrigenHorizontal = 900;
          
-      
         // let enemyGroup = this.physics.add.group();
         for (let i = 0; i < 1; i++) {
             let enemyOrigenVertical = Phaser.Math.Between(31, 569);
@@ -247,7 +245,7 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
+            this.scene.start('GameOver');
            
         }
     }
@@ -267,7 +265,7 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
+            this.scene.start('GameOver');
            
         }
     }
@@ -287,7 +285,7 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
-            this.scene.start('Play');
+            this.scene.start('GameOver');
            
         }
     }
@@ -300,7 +298,7 @@ class Nivel3 extends Phaser.Scene {
         enemy.destroy();
         this.puntajeText.setText("Score: " + this.puntaje + "/1000");
         if (this.puntaje >= 700 ) {
-            this.scene.start('Play');
+            this.scene.start('Boss');
         }
     }
     
@@ -312,7 +310,7 @@ class Nivel3 extends Phaser.Scene {
         shooter.destroy();
         this.puntajeText.setText("Score: " + this.puntaje + "/1000");
         if (this.puntaje >= 700 ) {
-            this.scene.start('Play');
+            this.scene.start('Boss');
          }
     }
 }
