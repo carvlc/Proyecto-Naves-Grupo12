@@ -17,13 +17,18 @@ class Nivel2 extends Phaser.Scene {
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
         this.load.image('pared','/public/img/pipe.png')
         this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
+        this.load.audio('fondo', '../public/sound/menu.mp3');
+        this.load.audio('laser', '../public/sound/blaster.mp3');
+        this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
+        this.load.audio('muerte', '../public/sound/player_death.wav');
+        this.load.image('white', '../public/img/white.png');
     }
 
     create() {
+        
         this.reload = true;
         this.balas = this.physics.add.group();
         this.bala;
-
 
 
         this.skyline = this.add.blitter(0, 0, 'space');
@@ -39,6 +44,7 @@ class Nivel2 extends Phaser.Scene {
         });
 
 
+
         // se crean paredes para eliminar elementos fuera del mundo
         this.paredes = this.physics.add.staticGroup();
         this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
@@ -47,7 +53,20 @@ class Nivel2 extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(100, 200, 'nave');
         this.player.setCollideWorldBounds(true);
-        particles.startFollow(this.player);
+
+        this.flame = this.add.particles(0, 0, 'white',
+        {
+            color: [ 0xfacc22, 0xf89800, 0xf83600, 0x9f0404 ],
+            colorEase: 'quad.out',
+            lifespan: 1000,
+            angle: { min: 175, max: 185 },
+            scale: { start: 0.40, end: 0, ease: 'sine.out' },
+            speed: 200,
+            advance: 2000,
+            blendMode: 'ADD'
+        });
+
+        this.flame.startFollow(this.player,-20,0);
 
         //para el movimiento player
         this.anims.create({
@@ -122,6 +141,8 @@ class Nivel2 extends Phaser.Scene {
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
+                this.disparo = this.sound.add('laser', {volume: 0.1});
+                this.disparo.play();
             }
         })
     }
@@ -175,6 +196,7 @@ class Nivel2 extends Phaser.Scene {
         this.vida=this.vida-25;
         this.vidaText.setText("Vida: "+this.vida+"%");     
         if(this.vida ==0){
+            this.sound.play('muerte');
             this.scene.start("GameOver",{puntaje: this.puntaje});
             player.setTint(0xff0000);
         }
@@ -184,6 +206,7 @@ class Nivel2 extends Phaser.Scene {
         this.puntaje += 10;
         bala.destroy();
         enemy.destroy();
+        this.sound.play('muerteEnemigo');
         this.scoreText.setText("Puntaje: "+this.puntaje+"/250");  
         if(this.puntaje==250){
             this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida});

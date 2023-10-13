@@ -15,9 +15,26 @@ class Nivel1 extends Phaser.Scene {
         this.load.image('item', '/public/img/shoot4.png')
         this.load.image('pared', '/public/img/pipe.png')
         this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
+        this.load.audio('fondo', '../public/sound/menu.mp3');
+        this.load.audio('laser', '../public/sound/blaster.mp3');
+        this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
+        this.load.audio('muerte', '../public/sound/player_death.wav');
     }
 
     create() {
+        this.sonido = this.sound.add('fondo');
+        const soundConfig = {
+            volume: 0.3,
+            loop: true
+        }
+        if (!this.sound.locked) {
+            this.sonido.play(soundConfig)
+        }
+        else {
+            this.sound.once(Phaser.Sound.Events.UNLOCKED, () =>{
+                this.sonido.play(soundConfig)
+            })
+        }
         this.puntaje = 0;
         this.vida = 100;
         this.reload = true;
@@ -116,6 +133,9 @@ class Nivel1 extends Phaser.Scene {
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
+                this.disparo = this.sound.add('laser', {volume: 0.1});
+                this.disparo.play();
+                
             }
         })
         this.physics.add.collider(this.player, this.powerup, this.obtenerPowerup, null, this);
@@ -171,6 +191,8 @@ class Nivel1 extends Phaser.Scene {
         this.vidaText.setText('Vida: ' + this.vida + '%');
         if (this.vida == 0) {
             this.vida = 100;
+            this.sound.play('muerte');
+            this.sonido.stop('fondo');
             this.scene.start('GameOver', { puntaje: this.puntaje });
             player.setTint(0xff0000)
         }
@@ -182,6 +204,7 @@ class Nivel1 extends Phaser.Scene {
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
+        this.sound.play('muerteEnemigo');
         this.puntajeText.setText("Puntaje: " + this.puntaje + "/100");
         if (this.puntaje == 100) {
             this.scene.start("Nivel2", { puntaje: this.puntaje , vida: this.vida});

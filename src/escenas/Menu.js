@@ -10,11 +10,28 @@ class Menu extends Phaser.Scene{
         this.load.spritesheet('nave', '../public/img/nave.png', { frameWidth: 70, frameHeight: 62 });
         this.load.image('white', '../public/img/white.png');
         this.load.spritesheet('sega', '../public/img/nave4.png', { frameWidth: 60, frameHeight: 56});
+        this.load.image('nombre', '../public/img/titulo.png');
+        this.load.audio('fondo', '../public/sound/menu.mp3');
     }
 
     create(){
 
+        this.sonido = this.sound.add('fondo');
+        const soundConfig = {
+            volume: 0.3,
+            loop: true
+        }
+        if (!this.sound.locked) {
+            this.sonido.play(soundConfig)
+        }
+        else {
+            this.sound.once(Phaser.Sound.Events.UNLOCKED, () =>{
+                this.sonido.play(soundConfig)
+            })
+        }
+
         this.add.image(400, 300, 'inicio');
+        this.add.image(400,275, 'nombre');
         this.nave = this.add.image(200, 100, "nave");
         this.sega = this.add.image(600, 400, 'sega');
         this.sega.setFlipX(true);
@@ -34,6 +51,7 @@ class Menu extends Phaser.Scene{
                 amount: 40,
                 onComplete: () => {
                     this.cameras.main.fadeOut(100);
+                    this.sonido.stop('fondo');
                     this.scene.start('Nivel1');
                 }
             })
@@ -54,7 +72,6 @@ class Menu extends Phaser.Scene{
 
         this.flame = this.add.particles(this.nave.x -90, this.nave.y, 'white',
             {
-                // frame: 'white',
                 color: [ 0xfacc22, 0xf89800, 0xf83600, 0x9f0404 ],
                 colorEase: 'quad.out',
                 lifespan: 1000,
@@ -67,7 +84,6 @@ class Menu extends Phaser.Scene{
 
         this.flame2 = this.add.particles(this.sega.x +90, this.sega.y, 'white',
         {
-            // frame: 'white',
             color: [ 0x96e0da, 0x937ef3 ],
             colorEase: 'quad.out',
             lifespan: 1000,
