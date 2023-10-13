@@ -31,7 +31,7 @@ class Boss extends Phaser.Scene {
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 1);
         // this.enemy.anims.play('bossAnimation');
         this.enemy.setBodySize(160, 64);
-        this.enemy.state=10;
+        this.enemy.state=20;
 
         this.enemyMoving = this.tweens.add({
             targets: this.enemy.body.velocity,
@@ -87,6 +87,12 @@ class Boss extends Phaser.Scene {
                 enemy.body.checkCollision.none = true;
                 this.enemyMoving.stop();
                 this.enemy.stop();
+                this.time.addEvent({
+                    delay: 4000,
+                    callback:() =>{this.scene.start('Win',{ puntaje: this.puntaje })},
+                    callbackScope: this,
+                    repeat: -1
+                })
             }
         });
    
