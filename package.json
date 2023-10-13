@@ -1,11 +1,11 @@
 {
   "name": "desafio-phaser-231005",
   "version": "1.0.0",
-  "description": "",
+  "description": "- Banzan César Emilio\r - Torres Flores Joaquin Victor\r - Vilca Carlos Norberto Salvador",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "main":"server.js",
+    "main": "server.js",
     "start": "nodemon server.js"
   },
   "keywords": [],
