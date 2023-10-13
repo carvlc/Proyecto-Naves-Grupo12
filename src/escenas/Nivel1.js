@@ -9,6 +9,7 @@ class Nivel1 extends Phaser.Scene {
         this.load.image('sky', '../../public/img/background1.png')
         this.load.image('enemy', '/public/img/enemy.png')
         this.load.image('cyan', '/public/img/cyan.png')
+        this.load.image('white','/public/img/white.png')
         this.load.image('shoot', '/public/img/shoot5.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
         this.load.image('item', '/public/img/shoot4.png')
@@ -44,12 +45,16 @@ class Nivel1 extends Phaser.Scene {
         this.skyline.create(0, 0);
         this.skyline.create(800, 0);
 
-
-        const particles = this.add.particles(0, 0, 'cyan', {
-            speed: 200,
-            angle: { min: 170, max: 190 },
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD',
+        this.flame = this.add.particles(0, 0, 'white',
+        {
+            color: [ 0x96e0da, 0x937ef3 ],
+            colorEase: 'quad.out',
+            lifespan: 1000,
+            angle: { min: 175, max: 185 },
+            scale: { start: 0.40, end: 0, ease: 'sine.out' },
+            speed: 220,
+            advance: 2000,
+            blendMode: 'ADD'
         });
 
 
@@ -61,7 +66,7 @@ class Nivel1 extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(this.game.config.width / 8, this.game.config.height / 2, 'sega');
         this.player.setCollideWorldBounds(true);
-        particles.startFollow(this.player);
+        this.flame.startFollow(this.player,-25,0);
 
         // para el movimiento de la nave player (animaciones)
         this.anims.create({

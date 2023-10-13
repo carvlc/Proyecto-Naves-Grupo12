@@ -10,10 +10,12 @@ class Nivel2 extends Phaser.Scene {
         this.vida = data.vida;
     }
     preload() {
-        this.load.image('space', '../../public/img/space3.png');
-        this.load.image('enemy', '/public/img/enemy.png');
-        this.load.image('shoot', '/public/img/shoot.png');
-        this.load.image('shootenemy', '/public/img/shootEnemy.png');
+        this.load.image('space', '../../public/img/space3.png')
+        this.load.image('enemy', '/public/img/enemy.png')
+        this.load.image('red', '/public/img/red.png')
+        this.load.image('shoot', '/public/img/shoot.png')
+        this.load.image('shootenemy', '/public/img/shootEnemy.png')
+        this.load.image('pared','/public/img/pipe.png')
         this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
         this.load.audio('fondo', '../public/sound/menu.mp3');
         this.load.audio('laser', '../public/sound/blaster.mp3');
@@ -28,7 +30,26 @@ class Nivel2 extends Phaser.Scene {
         this.balas = this.physics.add.group();
         this.bala;
 
-        this.add.image(400, 300, 'space');
+
+        this.skyline = this.add.blitter(0, 0, 'space');
+        this.skyline.create(0, 0);
+        this.skyline.create(800, 0);
+
+        const particles = this.add.particles(-15, 0, 'red', {
+            speed: 50,
+            angle: { min: 90, max: 275 },
+            scale: { start: 1, end: 0 },
+            blendMode: 'ADD',
+
+        });
+
+
+
+        // se crean paredes para eliminar elementos fuera del mundo
+        this.paredes = this.physics.add.staticGroup();
+        this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
+        this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
+
 
         this.player = this.physics.add.sprite(100, 200, 'nave');
         this.player.setCollideWorldBounds(true);
@@ -86,13 +107,16 @@ class Nivel2 extends Phaser.Scene {
             repeat: -1
         })
 
-        
+        this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
         this.scoreText = this.add.text(16, 16, 'Puntaje: ' + this.puntaje + '/250', { fontSize: '32px', fill: '#FFFFFF' });
         this.vidaText = this.add.text(16, 50, "Vida: " + this.vida + '%', { fontSize: '32px', fill: '#FFFFFF' });
 
     }
 
     update() {
+        this.skyline.x -= 1;
+        this.skyline.x %= -800;
+        
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
             this.player.anims.play('izquierda');
@@ -140,12 +164,6 @@ class Nivel2 extends Phaser.Scene {
         this.posicionPlayer = this.player.body.position;
         let bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         bala.body.velocity.x = 600;
-        bala.checkWorldBounds= true;
-
-        bala.on('outOfBounds', () => {
-            bala.destroy();
-            console.log('se elimina');
-        });
     }
 
     createEnemy() {
@@ -156,15 +174,21 @@ class Nivel2 extends Phaser.Scene {
             let enemyPosicionAltura = Phaser.Math.Between(31, 569);
             this.enemy = this.physics.add.sprite(enemyDistanciaHorizontal, enemyPosicionAltura, 'enemy');
             this.enemy.body.velocity.x = -200;
-            this.enemy.checkWorldBounds= true;
-
-            if(this.enemy.body.position.x<0){
-                console.log("boooooooom")
-                this.enemy.destroy();
-            }
             this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy,this.balas,this.hitbullet, null, this);
+            this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
+
         }
+    }
+
+    outBullet(balas) {
+        balas.destroy();
+        console.log('se elimino la bala')
+    }
+
+    outEnemy(enemy) {
+        enemy.destroy();
+        console.log('se elimino el enemigo')
     }
 
     hitenemy(player,enemy){
@@ -179,13 +203,13 @@ class Nivel2 extends Phaser.Scene {
     }
     
     hitbullet(enemy,bala){
-        this.score=this.score+10;
+        this.puntaje += 10;
         bala.destroy();
         enemy.destroy();
         this.sound.play('muerteEnemigo');
         this.scoreText.setText("Puntaje: "+this.puntaje+"/250");  
         if(this.puntaje==250){
-            this.scene.start("Boss",{puntaje: this.puntaje, vida: this.vida});
+            this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida});
         }
     }
 }

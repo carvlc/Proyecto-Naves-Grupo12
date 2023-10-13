@@ -54,7 +54,8 @@ class Boss extends Phaser.Scene {
         this.physics.add.overlap(this.enemy, this.balas, (enemy, balas) =>
         {
             // const { x, y } = balas.body.center;
-
+            this.puntaje += 10;
+            this.scoreText.setText('Puntaje: ' + this.puntaje)
             enemy.state -= 1;
             balas.disableBody(true, true);
 
