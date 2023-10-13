@@ -30,7 +30,6 @@ class Nivel1 extends Phaser.Scene {
 
         this.flame = this.add.particles(0, 0, 'white',
         {
-            // frame: 'white',
             color: [ 0x96e0da, 0x937ef3 ],
             colorEase: 'quad.out',
             lifespan: 1000,
