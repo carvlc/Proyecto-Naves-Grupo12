@@ -11,7 +11,6 @@ class Nivel3 extends Phaser.Scene {
     preload() {
         this.load.image('space2', '../../public/img/fondo-space-1.PNG')
         this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('red', '/public/img/cyan.png')
         this.load.image('minicyan', '/public/img/mini-cyan.png')
         this.load.image('shoot', '/public/img/shoot4.png')
         this.load.image('shoot2', '/public/img/shoot3.png')
@@ -19,6 +18,11 @@ class Nivel3 extends Phaser.Scene {
         this.load.image('pared', '/public/img/pipe.png')
         this.load.image('white','/public/img/white.png')
         this.load.spritesheet('nave', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
+        this.load.audio('fondo', '../public/sound/menu.mp3');
+        this.load.audio('laser', '../public/sound/blaster.mp3');
+        this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
+        this.load.audio('muerte', '../public/sound/player_death.wav');
+        this.load.audio('vida', '../public/sound/vida.mp3');
     }
 
     create() {
@@ -132,6 +136,8 @@ class Nivel3 extends Phaser.Scene {
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
+                this.disparo = this.sound.add('laser', {volume: 0.1});
+                this.disparo.play();
             }
         })
     }
@@ -243,6 +249,8 @@ class Nivel3 extends Phaser.Scene {
     heal(balas, healer) {
         balas.destroy();
         healer.destroy();
+        this.vidaJugador = this.sound.add('vida', {volume: 0.1});
+        this.vidaJugador.play();
         if (this.vida < 100) {
             console.log("te curaste boludo qliao")
             this.healCount += 1;
@@ -298,6 +306,7 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
+            this.sound.play('muerte');
             this.scene.start('GameOver', { puntaje: this.puntaje });
         }
     }
@@ -317,6 +326,7 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
+            this.sound.play('muerte');
             this.scene.start('GameOver', { puntaje: this.puntaje });
         }
     }
@@ -325,6 +335,8 @@ class Nivel3 extends Phaser.Scene {
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
         this.puntajeText.setText("Puntaje: " + this.puntaje + "/1000");
         if (this.puntaje >= 1000) {
             this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
@@ -335,6 +347,8 @@ class Nivel3 extends Phaser.Scene {
         this.puntaje += 20;
         balas.destroy();
         shooter.destroy();
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
         this.puntajeText.setText("Puntaje: " + this.puntaje + "/1000");
         if (this.puntaje >= 1000) {
             this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });

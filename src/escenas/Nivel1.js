@@ -19,6 +19,7 @@ class Nivel1 extends Phaser.Scene {
         this.load.audio('laser', '../public/sound/blaster.mp3');
         this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
         this.load.audio('muerte', '../public/sound/player_death.wav');
+        this.load.audio('vida', '../public/sound/vida.mp3');
     }
 
     create() {
@@ -204,7 +205,9 @@ class Nivel1 extends Phaser.Scene {
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
-        this.sound.play('muerteEnemigo');
+        // this.sound.play('muerteEnemigo');
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
         this.puntajeText.setText("Puntaje: " + this.puntaje + "/100");
         if (this.puntaje == 100) {
             this.scene.start("Nivel2", { puntaje: this.puntaje , vida: this.vida});
@@ -223,6 +226,9 @@ class Nivel1 extends Phaser.Scene {
     obtenerPowerup() {
         console.log('powerup agarrado');
         this.vida += 100;
+        // this.sound.play('vida');
+        this.vidaJugador = this.sound.add('vida', {volume: 0.1});
+        this.vidaJugador.play();
         this.vidaText.setText('Vida: ' + this.vida + '%');
         this.powerup.destroy();
         this.particlesItem.destroy();

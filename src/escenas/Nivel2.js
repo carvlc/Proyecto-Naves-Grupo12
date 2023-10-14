@@ -10,18 +10,18 @@ class Nivel2 extends Phaser.Scene {
         this.vida = data.vida;
     }
     preload() {
-        this.load.image('space', '../../public/img/space3.png')
-        this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('red', '/public/img/red.png')
-        this.load.image('shoot', '/public/img/shoot.png')
-        this.load.image('shootenemy', '/public/img/shootEnemy.png')
-        this.load.image('pared','/public/img/pipe.png')
+        this.load.image('space', '../../public/img/space3.png');
+        this.load.image('enemy', '/public/img/enemy.png');
+        this.load.image('shoot', '/public/img/shoot.png');
+        this.load.image('shootenemy', '/public/img/shootEnemy.png');
         this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
+        this.load.image('pared', '/public/img/pipe.png')
         this.load.audio('fondo', '../public/sound/menu.mp3');
         this.load.audio('laser', '../public/sound/blaster.mp3');
         this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
         this.load.audio('muerte', '../public/sound/player_death.wav');
         this.load.image('white', '../public/img/white.png');
+        this.load.spritesheet('meteoro', '../public/img/meteo.png',{ frameWidth : 34.1, frameHeight: 34});
     }
 
     create() {
@@ -30,26 +30,7 @@ class Nivel2 extends Phaser.Scene {
         this.balas = this.physics.add.group();
         this.bala;
 
-
-        this.skyline = this.add.blitter(0, 0, 'space');
-        this.skyline.create(0, 0);
-        this.skyline.create(800, 0);
-
-        const particles = this.add.particles(-15, 0, 'red', {
-            speed: 50,
-            angle: { min: 90, max: 275 },
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD',
-
-        });
-
-
-
-        // se crean paredes para eliminar elementos fuera del mundo
-        this.paredes = this.physics.add.staticGroup();
-        this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
-        this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
-
+        this.add.image(400, 300, 'space');
 
         this.player = this.physics.add.sprite(100, 200, 'nave');
         this.player.setCollideWorldBounds(true);
@@ -67,6 +48,11 @@ class Nivel2 extends Phaser.Scene {
         });
 
         this.flame.startFollow(this.player,-20,0);
+
+        // se crean paredes para eliminar elementos fuera del mundo
+        this.paredes = this.physics.add.staticGroup();
+        this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
+        this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
 
         //para el movimiento player
         this.anims.create({
@@ -95,6 +81,15 @@ class Nivel2 extends Phaser.Scene {
             frameRate: 10
         })
 
+        this.createMeteoro();
+
+        this.time.addEvent({
+            delay: 500,
+            callback: this.createMeteoro,
+            callbackScope: this,
+            repeat: -1
+        })
+
         this.cursors = this.input.keyboard.createCursorKeys();
 
         // para los enemigos
@@ -107,6 +102,12 @@ class Nivel2 extends Phaser.Scene {
             repeat: -1
         })
 
+        this.anims.create({
+            key: 'meteoritoAnimacion',
+            frames: this.anims.generateFrameNames('meteoro', {star: 0, end:26}),
+            frameRate: 10,
+        })
+
         this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
         this.scoreText = this.add.text(16, 16, 'Puntaje: ' + this.puntaje + '/250', { fontSize: '32px', fill: '#FFFFFF' });
         this.vidaText = this.add.text(16, 50, "Vida: " + this.vida + '%', { fontSize: '32px', fill: '#FFFFFF' });
@@ -114,9 +115,6 @@ class Nivel2 extends Phaser.Scene {
     }
 
     update() {
-        this.skyline.x -= 1;
-        this.skyline.x %= -800;
-        
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-400);
             this.player.anims.play('izquierda');
@@ -164,6 +162,12 @@ class Nivel2 extends Phaser.Scene {
         this.posicionPlayer = this.player.body.position;
         let bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         bala.body.velocity.x = 600;
+        bala.checkWorldBounds= true;
+
+        bala.on('outOfBounds', () => {
+            bala.destroy();
+            console.log('se elimina');
+        });
     }
 
     createEnemy() {
@@ -174,21 +178,48 @@ class Nivel2 extends Phaser.Scene {
             let enemyPosicionAltura = Phaser.Math.Between(31, 569);
             this.enemy = this.physics.add.sprite(enemyDistanciaHorizontal, enemyPosicionAltura, 'enemy');
             this.enemy.body.velocity.x = -200;
+            this.enemy.checkWorldBounds= true;
+
+            if(this.enemy.body.position.x<0){
+                console.log("boooooooom")
+                this.enemy.destroy();
+            }
             this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy,this.balas,this.hitbullet, null, this);
             this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
+        }
+    }
 
+    createMeteoro() {
+    
+        let meteoroHorizontal = 800;
+
+        for (let i = 0; i < 1; i++) {
+            let meteoroPosicionAltura = Phaser.Math.Between(31, 569);
+            this.meteoro = this.physics.add.sprite(meteoroHorizontal, meteoroPosicionAltura, 'meteoro');
+            this.meteoro.body.velocity.x = -200;
+            this.meteoro.checkWorldBounds= true;
+
+            this.meteoro.play({key:'meteoritoAnimacion', repeat: -1});
+
+            this.physics.add.overlap(this.player, this.meteoro, this.hitmeteoro, null, this);
+            this.physics.add.collider(this.meteoro, this.paredes, this.outMeteoro, null, this);
         }
     }
 
     outBullet(balas) {
         balas.destroy();
-        console.log('se elimino la bala')
+        //console.log('se elimino la bala')
     }
 
     outEnemy(enemy) {
         enemy.destroy();
-        console.log('se elimino el enemigo')
+        //console.log('se elimino el enemigo')
+    }
+
+    outMeteoro(meteoro) {
+        meteoro.destroy();
+        //console.log('se elimino el meteoro')
     }
 
     hitenemy(player,enemy){
@@ -201,12 +232,24 @@ class Nivel2 extends Phaser.Scene {
             player.setTint(0xff0000);
         }
     }
+
+    hitmeteoro(player,meteoro){
+        meteoro.destroy();
+        this.vida=this.vida-25;
+        this.vidaText.setText("Vida: "+this.vida+"%");     
+        if(this.vida ==0){
+            this.sound.play('muerte');
+            this.scene.start("GameOver",{puntaje: this.puntaje});
+            player.setTint(0xff0000);
+        }
+    }
     
     hitbullet(enemy,bala){
-        this.puntaje += 10;
+        this.puntaje=this.puntaje+10;
         bala.destroy();
         enemy.destroy();
-        this.sound.play('muerteEnemigo');
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
         this.scoreText.setText("Puntaje: "+this.puntaje+"/250");  
         if(this.puntaje==250){
             this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida});
