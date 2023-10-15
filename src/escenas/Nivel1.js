@@ -8,10 +8,8 @@ class Nivel1 extends Phaser.Scene {
     preload() {
         this.load.image('sky', '../../public/img/background1.png')
         this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('cyan', '/public/img/cyan.png')
         this.load.image('white','/public/img/white.png')
         this.load.image('shoot', '/public/img/shoot5.png')
-        this.load.image('shootenemy', '/public/img/shootEnemy.png')
         this.load.image('item', '/public/img/shoot4.png')
         this.load.image('pared', '/public/img/pipe.png')
         this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
@@ -19,6 +17,7 @@ class Nivel1 extends Phaser.Scene {
         this.load.audio('laser', '../public/sound/blaster.mp3');
         this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
         this.load.audio('muerte', '../public/sound/player_death.wav');
+        this.load.audio('vida', '../public/sound/vida.mp3');
     }
 
     create() {
@@ -99,7 +98,7 @@ class Nivel1 extends Phaser.Scene {
         })
 
         this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
-        this.puntajeText = this.add.text(16, 16, 'Puntaje: ' + this.puntaje + '/100', { fontSize: '32px', fill: '#fff' })
+        this.puntajeText = this.add.text(16, 16, 'Puntaje: ' + this.puntaje + '/250', { fontSize: '32px', fill: '#fff' })
         this.vidaText = this.add.text(16, 50, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
 
     }
@@ -177,24 +176,31 @@ class Nivel1 extends Phaser.Scene {
 
     outBullet(balas) {
         balas.destroy();
-        console.log('se elimino la bala')
+        //console.log('se elimino la bala')
     }
 
     outEnemy(enemy) {
         enemy.destroy();
-        console.log('se elimino el enemigo')
+        //console.log('se elimino el enemigo')
     }
 
     hitenemy(player, enemy) {
         enemy.destroy();
         this.vida -= 25;
         this.vidaText.setText('Vida: ' + this.vida + '%');
+        player.setTint(0xff0000)
+            this.time.addEvent({
+                delay: 400,
+                callbackScope: this,
+                callback: function () {
+                    player.setTint();
+                }
+            })
         if (this.vida == 0) {
             this.vida = 100;
             this.sound.play('muerte');
             this.sonido.stop('fondo');
             this.scene.start('GameOver', { puntaje: this.puntaje });
-            player.setTint(0xff0000)
         }
 
     }
@@ -204,12 +210,13 @@ class Nivel1 extends Phaser.Scene {
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
-        this.sound.play('muerteEnemigo');
-        this.puntajeText.setText("Puntaje: " + this.puntaje + "/100");
-        if (this.puntaje == 100) {
-            this.scene.start("Nivel2", { puntaje: this.puntaje , vida: this.vida});
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/250");
+        if (this.puntaje == 250) {
+            this.scene.start("Nivel2", { puntaje: this.puntaje , vida: this.vida, sonido: this.sonido});
         }
-        if (this.puntaje == 50) {
+        if (this.puntaje == 100) {
             this.particlesItem = this.add.particles(0, 0, 'item', {
                 speed: 100,
                 scale: { start: 1, end: 0 },
@@ -223,9 +230,20 @@ class Nivel1 extends Phaser.Scene {
     obtenerPowerup() {
         console.log('powerup agarrado');
         this.vida += 100;
+        this.vidaJugador = this.sound.add('vida', {volume: 0.1});
+        this.vidaJugador.play();
         this.vidaText.setText('Vida: ' + this.vida + '%');
         this.powerup.destroy();
         this.particlesItem.destroy();
+        this.player.setTint(0x90ee90);
+            this.time.addEvent({
+                delay: 400,
+                callbackScope: this,
+                callback: function () {
+                    this.player.setTint();
+                }
+
+            })
     }
 
 }

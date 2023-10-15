@@ -9,10 +9,13 @@ class GameOver extends Phaser.Scene{
     preload(){
         this.load.image('gameover','/public/img/fondo-space-1.PNG');
         this.load.image('text','/public/img/gameover.png');
-        this.load.image('continuar','/public/img/continuar.png')
+        this.load.image('continuar','/public/img/continuar.png');
+        this.load.audio('lose','/public/sound/lose.mp3')
     }
 
     create(){
+        this.lose = this.sound.add('lose', {volume: 0.5});
+        this.lose.play();
         this.skyline = this.add.blitter(0, 0, 'gameover');
         this.skyline.create(0, 0);
         this.skyline.create(0, -800);

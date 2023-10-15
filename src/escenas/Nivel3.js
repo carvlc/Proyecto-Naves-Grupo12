@@ -1,24 +1,28 @@
 class Nivel3 extends Phaser.Scene {
     constructor() {
         super('Nivel3');
+        this.puntajeText = "";
         this.vida = 100;
         this.puntaje = 0;
     }
     init(data) {
         this.puntaje = data.puntaje;
         this.vida = data.vida;
+        this.sonido = data.sonido;
     }
     preload() {
         this.load.image('space2', '../../public/img/fondo-space-1.PNG')
         this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('red', '/public/img/cyan.png')
-        this.load.image('minicyan', '/public/img/mini-cyan.png')
-        this.load.image('shoot', '/public/img/shoot4.png')
+        this.load.image('shoot', '/public/img/shoot5.png')
         this.load.image('shoot2', '/public/img/shoot3.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
         this.load.image('pared', '/public/img/pipe.png')
         this.load.image('white','/public/img/white.png')
         this.load.spritesheet('nave', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
+        this.load.audio('laser', '../public/sound/blaster.mp3');
+        this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
+        this.load.audio('muerte', '../public/sound/player_death.wav');
+        this.load.audio('vida', '../public/sound/vida.mp3');
     }
 
     create() {
@@ -35,7 +39,6 @@ class Nivel3 extends Phaser.Scene {
 
         this.flame = this.add.particles(0, 0, 'white',
         {
-            // frame: 'white',
             color: [ 0x96e0da, 0x937ef3 ],
             colorEase: 'quad.out',
             lifespan: 1000,
@@ -98,7 +101,7 @@ class Nivel3 extends Phaser.Scene {
         })
 
         this.physics.add.collider(this.balas, this.paredes, this.outBullet, null, this);
-        this.puntajeText = this.add.text(16, 40, 'Puntaje: ' + this.puntaje + '/1000', { fontSize: '32px', fill: '#fff' })
+        this.puntajeText = this.add.text(16, 40, 'Puntaje: ' + this.puntaje + '/1500', { fontSize: '32px', fill: '#fff' })
         this.vidaText = this.add.text(16, 16, 'Vida: ' + this.vida + '%', { fontSize: '32px', fill: '#fff' })
     }
 
@@ -132,6 +135,8 @@ class Nivel3 extends Phaser.Scene {
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
+                this.disparo = this.sound.add('laser', {volume: 0.1});
+                this.disparo.play();
             }
         })
     }
@@ -153,7 +158,6 @@ class Nivel3 extends Phaser.Scene {
     disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        // console.log(this.posicionPlayer);
         this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
         this.bala.body.velocity.x = 400;
     }
@@ -181,16 +185,16 @@ class Nivel3 extends Phaser.Scene {
 
     outEnemy(enemy) {
         enemy.destroy();
-        console.log('se elimino el enemigo')
+        //console.log('se elimino el enemigo')
     }
 
     outHealer(healer) {
         healer.destroy();
-        console.log('se alimino el healer')
+        //console.log('se alimino el healer')
     }
     outShooter(healer) {
         healer.destroy();
-        console.log('se alimino el shooter')
+        //console.log('se alimino el shooter')
     }
 
     createHealer() {
@@ -212,7 +216,6 @@ class Nivel3 extends Phaser.Scene {
     // se crea nave que dispara
     createShooter() {
         let shooterOrigenHorizontal = 900;
-        // let shooterGroup = this.physics.add.group();
         for (let i = 0; i < 2; i++) {
             let shooterOrigenVertical = Phaser.Math.Between(31, 569);
 
@@ -233,7 +236,6 @@ class Nivel3 extends Phaser.Scene {
     enemyShoot() {
 
         this.posicionShooter = this.shooter.body.position;
-        // console.log(this.posicionShooter);
         this.balaenEmigo = this.balasEnemy.create(this.posicionShooter.x - 10, this.posicionShooter.y + 31, 'shoot2');
         this.balaenEmigo.body.velocity.x = -300;
     }
@@ -243,6 +245,8 @@ class Nivel3 extends Phaser.Scene {
     heal(balas, healer) {
         balas.destroy();
         healer.destroy();
+        this.vidaJugador = this.sound.add('vida', {volume: 0.1});
+        this.vidaJugador.play();
         if (this.vida < 100) {
             console.log("te curaste boludo qliao")
             this.healCount += 1;
@@ -279,6 +283,7 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
+            this.sonido.stop();
             this.scene.start('GameOver', { puntaje: this.puntaje });
         }
     }
@@ -298,6 +303,8 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
+            this.sonido.stop();
+            this.sound.play('muerte');
             this.scene.start('GameOver', { puntaje: this.puntaje });
         }
     }
@@ -317,6 +324,8 @@ class Nivel3 extends Phaser.Scene {
         })
         if (this.vida == 0) {
             this.vida = 100;
+            this.sonido.stop();
+            this.sound.play('muerte');
             this.scene.start('GameOver', { puntaje: this.puntaje });
         }
     }
@@ -325,8 +334,11 @@ class Nivel3 extends Phaser.Scene {
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
-        this.puntajeText.setText("Puntaje: " + this.puntaje + "/1000");
-        if (this.puntaje >= 1000) {
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/1500");
+        if (this.puntaje >= 1500) {
+            this.sonido.stop();
             this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
         }
     }
@@ -335,8 +347,11 @@ class Nivel3 extends Phaser.Scene {
         this.puntaje += 20;
         balas.destroy();
         shooter.destroy();
-        this.puntajeText.setText("Puntaje: " + this.puntaje + "/1000");
-        if (this.puntaje >= 1000) {
+        this.muerteEnemigo = this.sound.add('muerteEnemigo', {volume: 0.1});
+        this.muerteEnemigo.play();
+        this.puntajeText.setText("Puntaje: " + this.puntaje + "/1500");
+        if (this.puntaje >= 1500) {
+            this.sonido.stop();
             this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
         }
     }

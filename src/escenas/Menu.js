@@ -6,7 +6,6 @@ class Menu extends Phaser.Scene{
 
     preload(){
         this.load.image('inicio', '../public/img/space3.png');
-        this.load.image('start', '../public/img/boton1.png');
         this.load.spritesheet('nave', '../public/img/nave.png', { frameWidth: 70, frameHeight: 62 });
         this.load.image('white', '../public/img/white.png');
         this.load.spritesheet('sega', '../public/img/nave4.png', { frameWidth: 60, frameHeight: 56});
