@@ -342,7 +342,16 @@ class Nivel3 extends Phaser.Scene {
         this.puntajeText.setText("Puntaje: " + this.puntaje + "/1500");
         if (this.puntaje >= 1500) {
             this.sonido.stop();
-            this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
+            const pixelated = this.cameras.main.postFX.addPixelate(-1);
+            this.add.tween({
+                targets: pixelated,
+                duration: 700,
+                amount: 40,
+                onComplete: () => {
+                    this.cameras.main.fadeOut(100);
+                    this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
+                }
+            })
         }
     }
 
