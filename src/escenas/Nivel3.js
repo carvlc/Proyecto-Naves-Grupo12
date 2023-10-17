@@ -81,18 +81,19 @@ class Nivel3 extends Phaser.Scene {
         // para los enemigos
         this.createEnemy();
         this.time.addEvent({
-            delay: 400,
+            delay: 300,
             callback: this.createEnemy,
             callbackScope: this,
             repeat: -1
         })
         this.createShooter();
         this.time.addEvent({
-            delay: 1500,
+            delay: 1200,
             callback: this.createShooter,
             callbackScope: this,
             repeat: -1
         })
+ 
         this.time.addEvent({
             delay: 5000,
             callback: this.createHealer,
@@ -145,7 +146,7 @@ class Nivel3 extends Phaser.Scene {
         this.reload = false;
         if (!this.addreload) {
             this.time.addEvent({
-                delay: 700,
+                delay: 1500,
                 callback: () => {
                     this.reload = true;
                 },
@@ -225,9 +226,9 @@ class Nivel3 extends Phaser.Scene {
             this.shooter.setTint(0xff0075);
             this.shooter.body.velocity.x = -200;
             this.enemyShoot();
-
+        
             this.physics.add.overlap(this.player, this.shooter, this.hitShooter, null, this);
-            this.physics.add.overlap(this.balas, this.balasEnemy, this.collideBullet, null, this);
+            //this.physics.add.overlap(this.balas, this.balasEnemy, this.collideBullet, null, this);
             this.physics.add.overlap(this.player, this.balasEnemy, this.hitenemyBullet, null, this);
             this.physics.add.collider(this.shooter, this.balas, this.shootShooter, null, this);
             this.physics.add.collider(this.shooter, this.paredes, this.outShooter, null, this);
@@ -266,10 +267,10 @@ class Nivel3 extends Phaser.Scene {
             })
         }
     }
-    collideBullet(balas, balasEnemy) {
+ /*   collideBullet(balas, balasEnemy) {
         balasEnemy.destroy();
         balas.destroy();
-    }
+    }*/
     hitShooter(player, shooter) {
         shooter.destroy();
         this.vida -= 25;

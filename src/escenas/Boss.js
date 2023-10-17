@@ -243,7 +243,7 @@ class Boss extends Phaser.Scene {
         this.reload = false;
         if (!this.addreload) {
             this.time.addEvent({
-                delay: 500,
+                delay: 1500,
                 callback: () => {
                     this.reload = true;
                 },
@@ -270,7 +270,6 @@ class Boss extends Phaser.Scene {
             scale: { start: 1, end: 0 },
             advance: 1000,
             blendMode: 'ADD',
-
         });
         this.loadAtack.startFollow(this.enemy);
     }

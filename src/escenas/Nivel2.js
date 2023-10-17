@@ -155,7 +155,7 @@ class Nivel2 extends Phaser.Scene {
         this.reload = false;
         if (!this.addreload) {
             this.time.addEvent({
-                delay: 500,
+                delay: 1500,
                 callback: () => {
                     this.reload = true;
                 },
