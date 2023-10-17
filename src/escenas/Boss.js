@@ -63,7 +63,7 @@ class Boss extends Phaser.Scene {
         this.skyline.create(0, -800);
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 0);
         this.enemy.setBodySize(100, 100);
-        this.enemy.state=50;
+        this.enemy.state=200;
 
         this.enemyMoving = this.tweens.add({
             targets: this.enemy.body.velocity,
