@@ -80,7 +80,6 @@ class Boss extends Phaser.Scene {
         this.player = this.physics.add.sprite(400, 540, 'nave');
         this.player.setCollideWorldBounds(true);
         this.player.setRotation(4.71239);
-
        // this.bossShot();
         this.time.addEvent({
             delay: 2000,
