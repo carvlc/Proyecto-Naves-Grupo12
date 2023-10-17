@@ -24,6 +24,7 @@ class Win extends Phaser.Scene{
         this.continuar = this.add.image(400,500, 'continuar').setInteractive().setScale(0.5);
         this.continuar.on('pointerdown',() => {
             this.scene.start('Menu')
+            this.win.stop()
         });
         this.puntajeText = this.add.text(250,400,'Puntaje: ' + this.puntaje,{fontSize:'40px', fill:'#45ed48'});
     }

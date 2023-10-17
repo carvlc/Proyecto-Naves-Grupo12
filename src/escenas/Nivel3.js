@@ -13,7 +13,7 @@ class Nivel3 extends Phaser.Scene {
     preload() {
         this.load.image('space2', '../../public/img/fondo-space-1.PNG')
         this.load.image('enemy', '/public/img/enemy.png')
-        this.load.image('shoot', '/public/img/shoot5.png')
+        this.load.image('shoot', '/public/img/shoot.png')
         this.load.image('shoot2', '/public/img/shoot3.png')
         this.load.image('shootenemy', '/public/img/shootEnemy.png')
         this.load.image('pared', '/public/img/pipe.png')
@@ -158,8 +158,10 @@ class Nivel3 extends Phaser.Scene {
     disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
-        this.bala.body.velocity.x = 400;
+        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 10, 'shoot');
+        this.bala.body.velocity.x = 800;
+        this.bala2 = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 50, 'shoot');
+        this.bala2.body.velocity.x = 800;
     }
 
 

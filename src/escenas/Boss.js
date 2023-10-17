@@ -13,7 +13,7 @@ class Boss extends Phaser.Scene {
         this.load.image('final', '../../public/img/fondo-space-1.PNG')
         this.load.spritesheet('boss', '/public/img/buster.png', { frameWidth: 96, frameHeight: 112 })
         this.load.image('red', '../public/img/red.png');
-        this.load.image('shoot', '/public/img/shoot5.png');
+        this.load.image('shoot', '/public/img/shoot.png');
         this.load.image("bossShot","/public/img/shootBoss.png");
         this.load.image('pared1', '/public/img/platform.png')
         this.load.spritesheet('meteoro', '../public/img/meteo.png',{ frameWidth : 34.1, frameHeight: 34});
@@ -80,8 +80,7 @@ class Boss extends Phaser.Scene {
         this.player = this.physics.add.sprite(400, 540, 'nave');
         this.player.setCollideWorldBounds(true);
         this.player.setRotation(4.71239);
-
-        this.bossShot();
+       // this.bossShot();
         this.time.addEvent({
             delay: 2000,
             callback:this.bossShot,
@@ -92,6 +91,15 @@ class Boss extends Phaser.Scene {
         this.physics.add.overlap(this.enemy, this.balas, (enemy, balas) =>
         {
             this.puntaje += 10;
+            enemy.setTint(0xff0304);
+            this.time.addEvent({
+                delay: 100,
+                callbackScope: this,
+                callback: function () {
+                    enemy.setTint();
+                }
+    
+            })
             this.scoreText.setText('Puntaje: ' + this.puntaje)
             enemy.state -= 1;
             balas.disableBody(true, true);
@@ -247,9 +255,12 @@ class Boss extends Phaser.Scene {
     disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        let bala = this.balas.create(this.posicionPlayer.x + 35, this.posicionPlayer.y, 'shoot');
+        let bala = this.balas.create(this.posicionPlayer.x + 10, this.posicionPlayer.y, 'shoot');
         bala.setRotation(4.71239);
         bala.body.velocity.y = -600;
+        let bala2 = this.balas.create(this.posicionPlayer.x + 50, this.posicionPlayer.y , 'shoot');
+        bala2.body.velocity.y = -600;
+        bala2.setRotation(4.71239);
     }
     bossLoad(){
         this.loadAtack = this.add.particles(0, 15, 'red', {
@@ -287,6 +298,7 @@ class Boss extends Phaser.Scene {
 
             this.physics.add.overlap(this.player, this.meteoro, this.hitmeteoro, null, this);
             this.physics.add.collider(this.meteoro, this.paredes1, this.outMeteoro, null, this);
+            this.physics.add.overlap(this.meteoro,this.balas,this.bulletmeteor,null,this);
         }
     }
 
@@ -294,7 +306,9 @@ class Boss extends Phaser.Scene {
         balas.destroy();
         //console.log('se elimino la bala')
     }
-
+    bulletmeteor(balas,meteoro){
+        meteoro.destroy();
+    }   
     outMeteoro(meteoro) {
         meteoro.destroy();
         //console.log('se elimino el meteoro')

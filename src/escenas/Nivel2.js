@@ -13,7 +13,7 @@ class Nivel2 extends Phaser.Scene {
     preload() {
         this.load.image('space', '../../public/img/space3.png');
         this.load.image('enemy', '/public/img/enemy.png');
-        this.load.image('shoot', '/public/img/shoot5.png');
+        this.load.image('shoot', '/public/img/shoot.png');
         this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
         this.load.image('pared', '/public/img/pipe.png')
         this.load.audio('laser', '../public/sound/blaster.mp3');
@@ -167,14 +167,10 @@ class Nivel2 extends Phaser.Scene {
     disparar() {
         this.recarga();
         this.posicionPlayer = this.player.body.position;
-        let bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 31, 'shoot');
+        let bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 10, 'shoot');
         bala.body.velocity.x = 600;
-        // bala.checkWorldBounds= true;
-
-        // bala.on('outOfBounds', () => {
-        //     bala.destroy();
-        //     console.log('se elimina');
-        // });
+        this.bala2 = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 50, 'shoot');
+        this.bala2.body.velocity.x = 600;
     }
 
     createEnemy() {
@@ -211,9 +207,13 @@ class Nivel2 extends Phaser.Scene {
 
             this.physics.add.overlap(this.player, this.meteoro, this.hitmeteoro, null, this);
             this.physics.add.collider(this.meteoro, this.paredes, this.outMeteoro, null, this);
+            this.physics.add.overlap(this.balas,this.meteoro,this.bulletmeteor,null,this)
         }
     }
-
+    bulletmeteor(balas,meteoro){
+        meteoro.destroy();
+        console.log("paso algo xd")
+    }   
     outBullet(balas) {
         balas.destroy();
         console.log('se elimino la bala')
