@@ -181,12 +181,7 @@ class Nivel2 extends Phaser.Scene {
             let enemyPosicionAltura = Phaser.Math.Between(31, 569);
             this.enemy = this.physics.add.sprite(enemyDistanciaHorizontal, enemyPosicionAltura, 'enemy');
             this.enemy.body.velocity.x = -200;
-            // this.enemy.checkWorldBounds= true;
-
-            // if(this.enemy.body.position.x<0){
-            //     console.log("boooooooom")
-            //     this.enemy.destroy();
-            // }
+            
             this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy,this.balas,this.hitbullet, null, this);
             this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
@@ -275,7 +270,16 @@ class Nivel2 extends Phaser.Scene {
         this.muerteEnemigo.play();
         this.scoreText.setText("Puntaje: "+this.puntaje+"/750");  
         if(this.puntaje==750){
-            this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida, sonido: this.sonido});
+            const pixelated = this.cameras.main.postFX.addPixelate(-1);
+            this.add.tween({
+                targets: pixelated,
+                duration: 700,
+                amount: 40,
+                onComplete: () => {
+                    this.cameras.main.fadeOut(100);
+                    this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida, sonido: this.sonido});
+                }
+            })
         }
     }
 }
