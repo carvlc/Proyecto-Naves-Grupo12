@@ -34,6 +34,7 @@ class Menu extends Phaser.Scene{
         this.nave = this.add.image(200, 100, "nave");
         this.sega = this.add.image(600, 400, 'sega');
         this.sega.setFlipX(true);
+        //console.log(this.numJugador);
 
         const pixelated = this.cameras.main.postFX.addPixelate(-1);
 
@@ -50,8 +51,8 @@ class Menu extends Phaser.Scene{
                 amount: 40,
                 onComplete: () => {
                     this.cameras.main.fadeOut(100);
-                    this.sonido.stop('fondo');
-                    this.scene.start('Nivel1');
+                    //this.sonido.stop('fondo');
+                    this.scene.start('Seleccion',{sonido: this.sonido});
                 }
             })
         });
