@@ -8,6 +8,7 @@ class Boss extends Phaser.Scene {
     init(data){
         this.puntaje = data.puntaje;
         this.vida = data.vida;
+        this.numJugador = data.numJugador;
     }
     preload() {
         this.load.image('final', '../../public/img/fondo-space-1.PNG')
@@ -18,6 +19,7 @@ class Boss extends Phaser.Scene {
         this.load.image('pared1', '/public/img/platform.png')
         this.load.spritesheet('meteoro', '../public/img/meteo.png',{ frameWidth : 34.1, frameHeight: 34});
         this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
+        this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 })
         this.load.audio('laser', '../public/sound/blaster.mp3');
         this.load.audio('muerte', '../public/sound/player_death.wav');
         this.load.audio('grito', '../public/sound/grito.mp3');
@@ -63,7 +65,8 @@ class Boss extends Phaser.Scene {
         this.skyline.create(0, -800);
         this.enemy = this.physics.add.sprite(400, 128, 'boss', 0);
         this.enemy.setBodySize(100, 100);
-        this.enemy.state=50;
+        this.enemy.state=200;
+        console.log(this.numJugador);
 
         this.enemyMoving = this.tweens.add({
             targets: this.enemy.body.velocity,
@@ -76,11 +79,102 @@ class Boss extends Phaser.Scene {
             repeat: -1
         });
         
+        if (this.numJugador == 1) {
 
-        this.player = this.physics.add.sprite(400, 540, 'nave');
-        this.player.setCollideWorldBounds(true);
-        this.player.setRotation(4.71239);
-       // this.bossShot();
+            this.player = this.physics.add.sprite(400, 540, 'nave');
+            this.player.setCollideWorldBounds(true);
+            this.player.setRotation(4.71239);
+
+            this.llamas = this.add.particles(0, 0, 'white',
+            {
+                color: [ 0xfacc22, 0xf89800, 0xf83600, 0x9f0404 ],
+                colorEase: 'quad.out',
+                lifespan: 1000,
+                angle: { min: 85, max: 95 },
+                scale: { start: 0.40, end: 0, ease: 'sine.out' },
+                speed: 200,
+                advance: 2000,
+                blendMode: 'ADD'
+            });
+        
+            this.llamas.startFollow(this.player,0,25);
+
+            this.anims.create({
+                key: 'izquierda1',
+                frames: [{ key: 'nave', frame: 2 }],
+                frameRate: 10
+            });
+            this.anims.create({
+                key: 'quieto1',
+                frames: [{ key: 'nave', frame: 0 }],
+                frameRate: 20
+            })
+            this.anims.create({
+                key: 'derecha1',
+                frames: [{ key: 'nave', frame: 1 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'arriba1',
+                frames: [{ key: 'nave', frame: 0 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'abajo1',
+                frames: [{ key: 'nave', frame: 0 }],
+                frameRate: 10
+            })
+    
+            
+        }
+        if (this.numJugador == 2) {
+
+            this.flame = this.add.particles(0, 0, 'white',
+            {
+                color: [ 0x96e0da, 0x937ef3 ],
+                colorEase: 'quad.out',
+                lifespan: 1000,
+                angle: { min: 85, max: 95 },
+                scale: { start: 0.40, end: 0, ease: 'sine.out' },
+                speed: 220,
+                advance: 2000,
+                blendMode: 'ADD'
+            });
+
+            this.player = this.physics.add.sprite(400, 540, 'sega');
+            this.player.setCollideWorldBounds(true);
+            this.player.setRotation(4.71239);
+
+            this.flame.startFollow(this.player,0,25);
+
+            this.anims.create({
+                key: 'segaquieto1',
+                frames: [{ key: 'sega', frame: 0 }],
+                frameRate: 20
+            })
+            this.anims.create({
+                key: 'segaarriba1',
+                frames: [{ key: 'sega', frame: 0 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'segaabajo1',
+                frames: [{ key: 'sega', frame: 0 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'segaizquierda1',
+                frames: [{ key: 'sega', frame: 1 }],
+                frameRate: 10
+            });
+            this.anims.create({
+                key: 'segaderecha1',
+                frames: [{ key: 'sega', frame: 2 }],
+                frameRate: 10
+            })
+            
+        }
+
         this.time.addEvent({
             delay: 2000,
             callback:this.bossShot,
@@ -128,52 +222,11 @@ class Boss extends Phaser.Scene {
             callbackScope: this,
             repeat: -1
         })
-        
-        this.llamas = this.add.particles(0, 0, 'white',
-        {
-            color: [ 0xfacc22, 0xf89800, 0xf83600, 0x9f0404 ],
-            colorEase: 'quad.out',
-            lifespan: 1000,
-            angle: { min: 85, max: 95 },
-            scale: { start: 0.40, end: 0, ease: 'sine.out' },
-            speed: 200,
-            advance: 2000,
-            blendMode: 'ADD'
-        });
-        
-        this.llamas.startFollow(this.player,0,20);
 
         // se crean paredes para eliminar elementos fuera del mundo
         this.paredes1 = this.physics.add.staticGroup();
-        this.paredes1.create( this.game.config.width / 2, -100, 'pared1').setScale(2).refreshBody()
-        this.paredes1.create(this.game.config.width / 2,this.game.config.height + 200, 'pared1').setScale(2).refreshBody()
-    
-        // para el movimiento player
-        this.anims.create({
-            key: 'izquierda1',
-            frames: [{ key: 'nave', frame: 2 }],
-            frameRate: 10
-        });
-        this.anims.create({
-            key: 'quieto1',
-            frames: [{ key: 'nave', frame: 0 }],
-            frameRate: 20
-        })
-        this.anims.create({
-            key: 'derecha1',
-            frames: [{ key: 'nave', frame: 1 }],
-            frameRate: 10
-        })
-        this.anims.create({
-            key: 'arriba1',
-            frames: [{ key: 'nave', frame: 0 }],
-            frameRate: 10
-        })
-        this.anims.create({
-            key: 'abajo1',
-            frames: [{ key: 'nave', frame: 0 }],
-            frameRate: 10
-        })
+        this.paredes1.create( this.game.config.width / 2, -100, 'pared1').setScale(2).refreshBody();
+        this.paredes1.create(this.game.config.width / 2,this.game.config.height + 200, 'pared1').setScale(2).refreshBody();
 
         this.anims.create({
             key: 'bossAnimacion',
@@ -210,27 +263,77 @@ class Boss extends Phaser.Scene {
         this.skyline.y += 1;
         this.skyline.y %= 800;
 
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-400);
-            this.player.anims.play('izquierda1');
+        if (this.numJugador == 1) {
+            
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-400);
+                this.player.anims.play('izquierda1');
+            }
+            else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(400);
+                this.player.anims.play('derecha1');
+            }
+            else if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-500);
+                this.player.anims.play('arriba1')
+            }
+            else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(500)
+                this.player.anims.play('abajo1')
+            }
+            else {
+                this.player.setVelocityY(0);
+                this.player.setVelocityX(0);
+                this.player.anims.play('quieto1', true)
+            }
         }
-        else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(400);
-            this.player.anims.play('derecha1');
+
+        if (this.numJugador == 2) {
+            
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-400);
+                this.player.anims.play('segaizquierda1');
+            }
+            else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(400);
+                this.player.anims.play('segaderecha1');
+            }
+            else if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-500);
+                this.player.anims.play('segaarriba1')
+            }
+            else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(500)
+                this.player.anims.play('segaabajo1')
+            }
+            else {
+                this.player.setVelocityY(0);
+                this.player.setVelocityX(0);
+                this.player.anims.play('segaquieto1', true)
+            }
         }
-        else if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-500);
-            this.player.anims.play('arriba1')
-        }
-        else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(500)
-            this.player.anims.play('abajo1')
-        }
-        else {
-            this.player.setVelocityY(0);
-            this.player.setVelocityX(0);
-            this.player.anims.play('quieto1', true)
-        }
+
+        // if (this.cursors.left.isDown) {
+        //     this.player.setVelocityX(-400);
+        //     this.player.anims.play('izquierda1');
+        // }
+        // else if (this.cursors.right.isDown) {
+        //     this.player.setVelocityX(400);
+        //     this.player.anims.play('derecha1');
+        // }
+        // else if (this.cursors.up.isDown) {
+        //     this.player.setVelocityY(-500);
+        //     this.player.anims.play('arriba1')
+        // }
+        // else if (this.cursors.down.isDown) {
+        //     this.player.setVelocityY(500)
+        //     this.player.anims.play('abajo1')
+        // }
+        // else {
+        //     this.player.setVelocityY(0);
+        //     this.player.setVelocityX(0);
+        //     this.player.anims.play('quieto1', true)
+        // }
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
@@ -303,24 +406,20 @@ class Boss extends Phaser.Scene {
 
     outBullet(balas) {
         balas.destroy();
-        //console.log('se elimino la bala')
     }
     bulletmeteor(balas,meteoro){
         meteoro.destroy();
     }   
     outMeteoro(meteoro) {
         meteoro.destroy();
-        //console.log('se elimino el meteoro')
     }
 
     outBossShot(disparoBoss) {
         this.disparoBoss.destroy();
-        console.log('se elimino el tiro')
     }
 
     hitBoss(disparoBoss,player){
         this.disparoBoss.destroy();
-        console.log("auchie auch");
         this.vida=this.vida-25;
         this.vidaText.setText("Vida: "+this.vida+"%");
         player.setTint(0xff0000)

@@ -9,12 +9,14 @@ class Nivel2 extends Phaser.Scene {
         this.puntaje = data.puntaje;
         this.vida = data.vida;
         this.sonido = data.sonido;
+        this.numJugador = data.numJugador;
     }
     preload() {
         this.load.image('space', '../../public/img/space3.png');
         this.load.image('enemy', '/public/img/enemy.png');
         this.load.image('shoot', '/public/img/shoot.png');
-        this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 })
+        this.load.spritesheet('nave', '/public/img/nave.png', { frameWidth: 70, frameHeight: 62 });
+        this.load.spritesheet('sega', '/public/img/nave4.png', { frameWidth: 60, frameHeight: 56 });
         this.load.image('pared', '/public/img/pipe.png')
         this.load.audio('laser', '../public/sound/blaster.mp3');
         this.load.audio('muerteEnemigo', '../public/sound/alien_death.wav');
@@ -31,59 +33,109 @@ class Nivel2 extends Phaser.Scene {
         this.bala;
 
         this.add.image(400, 300, 'space');
+        console.log(this.numJugador);
 
         this.skyline = this.add.blitter(0, 0, 'space');
         this.skyline.create(0, 0);
         this.skyline.create(800, 0);
 
-        this.player = this.physics.add.sprite(100, 200, 'nave');
-        this.player.setCollideWorldBounds(true);
+        if (this.numJugador == 1) {
 
-        this.flame = this.add.particles(0, 0, 'white',
-        {
-            color: [ 0xfacc22, 0xf89800, 0xf83600, 0x9f0404 ],
-            colorEase: 'quad.out',
-            lifespan: 1000,
-            angle: { min: 175, max: 185 },
-            scale: { start: 0.40, end: 0, ease: 'sine.out' },
-            speed: 200,
-            advance: 2000,
-            blendMode: 'ADD'
-        });
+            this.player = this.physics.add.sprite(100, 200, 'nave');
+            this.player.setCollideWorldBounds(true);
 
-        this.flame.startFollow(this.player,-20,0);
+            this.flame = this.add.particles(0, 0, 'white',
+            {
+                color: [ 0xfacc22, 0xf89800, 0xf83600, 0x9f0404 ],
+                colorEase: 'quad.out',
+                lifespan: 1000,
+                angle: { min: 175, max: 185 },
+                scale: { start: 0.40, end: 0, ease: 'sine.out' },
+                speed: 200,
+                advance: 2000,
+                blendMode: 'ADD'
+            });
+
+            this.flame.startFollow(this.player,-20,0);
+
+            this.anims.create({
+                key: 'izquierda',
+                frames: [{ key: 'nave', frame: 0 }],
+                frameRate: 10
+            });
+            this.anims.create({
+                key: 'quieto',
+                frames: [{ key: 'nave', frame: 0 }],
+                frameRate: 20
+            })
+            this.anims.create({
+                key: 'derecha',
+                frames: [{ key: 'nave', frame: 0 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'arriba',
+                frames: [{ key: 'nave', frame: 2 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'abajo',
+                frames: [{ key: 'nave', frame: 1 }],
+                frameRate: 10
+            })
+            
+        }
+        
+        if (this.numJugador == 2) {
+
+            this.flame = this.add.particles(0, 0, 'white',
+            {
+                color: [ 0x96e0da, 0x937ef3 ],
+                colorEase: 'quad.out',
+                lifespan: 1000,
+                angle: { min: 175, max: 185 },
+                scale: { start: 0.40, end: 0, ease: 'sine.out' },
+                speed: 220,
+                advance: 2000,
+                blendMode: 'ADD'
+            });
+
+            this.player = this.physics.add.sprite(this.game.config.width / 8, this.game.config.height / 2, 'sega');
+            this.player.setCollideWorldBounds(true);
+            this.flame.startFollow(this.player,-25,0);
+
+            this.anims.create({
+                key: 'segaquieto',
+                frames: [{ key: 'sega', frame: 0 }],
+                frameRate: 20
+            })
+            this.anims.create({
+                key: 'segaarriba',
+                frames: [{ key: 'sega', frame: 1 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'segaabajo',
+                frames: [{ key: 'sega', frame: 2 }],
+                frameRate: 10
+            })
+            this.anims.create({
+                key: 'segaizquierda',
+                frames: [{ key: 'sega', frame: 0 }],
+                frameRate: 10
+            });
+            this.anims.create({
+                key: 'segaderecha',
+                frames: [{ key: 'sega', frame: 0 }],
+                frameRate: 10
+            })
+            
+        }
 
         // se crean paredes para eliminar elementos fuera del mundo
         this.paredes = this.physics.add.staticGroup();
         this.paredes.create(-100, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
         this.paredes.create(this.game.config.width + 200, this.game.config.height / 2, 'pared').setScale(2).refreshBody();
-
-        //para el movimiento player
-        this.anims.create({
-            key: 'izquierda',
-            frames: [{ key: 'nave', frame: 0 }],
-            frameRate: 10
-        });
-        this.anims.create({
-            key: 'quieto',
-            frames: [{ key: 'nave', frame: 0 }],
-            frameRate: 20
-        })
-        this.anims.create({
-            key: 'derecha',
-            frames: [{ key: 'nave', frame: 0 }],
-            frameRate: 10
-        })
-        this.anims.create({
-            key: 'arriba',
-            frames: [{ key: 'nave', frame: 2 }],
-            frameRate: 10
-        })
-        this.anims.create({
-            key: 'abajo',
-            frames: [{ key: 'nave', frame: 1 }],
-            frameRate: 10
-        })
 
         this.createMeteoro();
 
@@ -123,27 +175,79 @@ class Nivel2 extends Phaser.Scene {
         this.skyline.x -= 1;
         this.skyline.x %= -800;
 
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-400);
-            this.player.anims.play('izquierda');
+        if (this.numJugador == 1) {
+
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-400);
+                this.player.anims.play('izquierda');
+            }
+            else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(400);
+                this.player.anims.play('derecha');
+            }
+            else if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-500);
+                this.player.anims.play('arriba')
+            }
+            else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(500)
+                this.player.anims.play('abajo')
+            }
+            else {
+                this.player.setVelocityY(0);
+                this.player.setVelocityX(0);
+                this.player.anims.play('quieto', true)
+            }
+            
         }
-        else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(400);
-            this.player.anims.play('derecha');
+
+        if (this.numJugador == 2) {
+
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-400);
+                this.player.anims.play('segaizquierda');
+            }
+            else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(400);
+                this.player.anims.play('segaderecha');
+            }
+            else if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-500);
+                this.player.anims.play('segaarriba')
+            }
+            else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(500)
+                this.player.anims.play('segaabajo')
+            }
+            else {
+                this.player.setVelocityY(0);
+                this.player.setVelocityX(0);
+                this.player.anims.play('segaquieto', true)
+            }
+            
         }
-        else if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-500);
-            this.player.anims.play('arriba')
-        }
-        else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(500)
-            this.player.anims.play('abajo')
-        }
-        else {
-            this.player.setVelocityY(0);
-            this.player.setVelocityX(0);
-            this.player.anims.play('quieto', true)
-        }
+
+        // if (this.cursors.left.isDown) {
+        //     this.player.setVelocityX(-400);
+        //     this.player.anims.play('izquierda');
+        // }
+        // else if (this.cursors.right.isDown) {
+        //     this.player.setVelocityX(400);
+        //     this.player.anims.play('derecha');
+        // }
+        // else if (this.cursors.up.isDown) {
+        //     this.player.setVelocityY(-500);
+        //     this.player.anims.play('arriba')
+        // }
+        // else if (this.cursors.down.isDown) {
+        //     this.player.setVelocityY(500)
+        //     this.player.anims.play('abajo')
+        // }
+        // else {
+        //     this.player.setVelocityY(0);
+        //     this.player.setVelocityX(0);
+        //     this.player.anims.play('quieto', true)
+        // }
         this.input.keyboard.on('keydown', (event) => {
             if (event.keyCode == 32 && this.reload) {
                 this.disparar();
@@ -199,12 +303,7 @@ class Nivel2 extends Phaser.Scene {
             let enemyPosicionAltura = Phaser.Math.Between(31, 569);
             this.enemy = this.physics.add.sprite(enemyDistanciaHorizontal, enemyPosicionAltura, 'enemy');
             this.enemy.body.velocity.x = -200;
-            // this.enemy.checkWorldBounds= true;
-
-            // if(this.enemy.body.position.x<0){
-            //     console.log("boooooooom")
-            //     this.enemy.destroy();
-            // }
+            
             this.physics.add.overlap(this.player, this.enemy, this.hitenemy, null, this);
             this.physics.add.collider(this.enemy,this.balas,this.hitbullet, null, this);
             this.physics.add.collider(this.enemy, this.paredes, this.outEnemy, null, this);
@@ -230,21 +329,17 @@ class Nivel2 extends Phaser.Scene {
     }
     bulletmeteor(balas,meteoro){
         meteoro.destroy();
-        console.log("paso algo xd")
     }   
     outBullet(balas) {
         balas.destroy();
-        console.log('se elimino la bala')
     }
 
     outEnemy(enemy) {
         enemy.destroy();
-        console.log('se elimino el enemigo')
     }
 
     outMeteoro(meteoro) {
         meteoro.destroy();
-        //console.log('se elimino el meteoro')
     }
 
     hitenemy(player,enemy){
@@ -294,7 +389,16 @@ class Nivel2 extends Phaser.Scene {
         this.muerteEnemigo.play();
         this.scoreText.setText("Puntaje: "+this.puntaje+"/750");  
         if(this.puntaje==750){
-            this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida, sonido: this.sonido});
+            const pixelated = this.cameras.main.postFX.addPixelate(-1);
+            this.add.tween({
+                targets: pixelated,
+                duration: 700,
+                amount: 40,
+                onComplete: () => {
+                    this.cameras.main.fadeOut(100);
+                    this.scene.start("Nivel3",{puntaje: this.puntaje, vida: this.vida, sonido: this.sonido, numJugador: this.numJugador});
+                }
+            })
         }
         if(contPower>90){
             this.doubleShotParticles = this.add.particles(0, 0, 'item', {
