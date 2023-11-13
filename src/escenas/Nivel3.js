@@ -26,6 +26,7 @@ class Nivel3 extends Phaser.Scene {
     }
 
     create() {
+        this.disparoDoble=false;
         this.healCount = 0;
         this.reload = true;
         this.reloadEnemy = true;
@@ -140,29 +141,44 @@ class Nivel3 extends Phaser.Scene {
                 this.disparo.play();
             }
         })
+        this.physics.add.collider(this.player, this.doubleShot, this.obtenerDoubleShot, null, this);
     }
 
     recarga() {
         this.reload = false;
         if (!this.addreload) {
             this.time.addEvent({
-                delay: 1500,
+                delay: 700,
                 callback: () => {
                     this.reload = true;
                 },
                 callbackScope: this,
-                repeat: -1
+                repeat: 0
             })
         }
     }
-
+  
     disparar() {
+        
+        if(this.disparoDoble==true){
+            this.balaDoble()
+        }else{
+            this.balaUnica();
+        }
+    }
+    balaUnica(){
+        this.recarga();
+        this.posicionPlayer = this.player.body.position;
+        this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 30, 'shoot');
+        this.bala.body.velocity.x = 800;
+    }
+    balaDoble(){
         this.recarga();
         this.posicionPlayer = this.player.body.position;
         this.bala = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 10, 'shoot');
-        this.bala.body.velocity.x = 800;
         this.bala2 = this.balas.create(this.posicionPlayer.x + 70, this.posicionPlayer.y + 50, 'shoot');
         this.bala2.body.velocity.x = 800;
+        this.bala.body.velocity.x = 800;
     }
 
 
@@ -334,6 +350,7 @@ class Nivel3 extends Phaser.Scene {
     }
 
     hitbullet(enemy, balas) {
+        let contPower=Phaser.Math.Between(1,100);
         this.puntaje += 10;
         balas.destroy();
         enemy.destroy();
@@ -344,9 +361,19 @@ class Nivel3 extends Phaser.Scene {
             this.sonido.stop();
             this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
         }
+        if(contPower>90){
+            this.doubleShotParticles = this.add.particles(0, 0, 'item', {
+                speed: 100,
+                scale: { start: 1, end: 0 },
+                blendMode: 'ADD',
+            })
+            this.doubleShot = this.physics.add.sprite(600, 400, 'item').setVelocity(150, 200).setCollideWorldBounds(true, 1, 1, true).setScale();
+            this.doubleShotParticles.startFollow(this.doubleShot);
+        }
     }
 
     shootShooter(shooter, balas) {
+        let contPower=Phaser.Math.Between(1,100);
         this.puntaje += 20;
         balas.destroy();
         shooter.destroy();
@@ -357,6 +384,30 @@ class Nivel3 extends Phaser.Scene {
             this.sonido.stop();
             this.scene.start('Boss', { puntaje: this.puntaje, vida: this.vida });
         }
+        if(contPower>90){
+            this.doubleShotParticles = this.add.particles(0, 0, 'item', {
+                speed: 100,
+                scale: { start: 1, end: 0 },
+                blendMode: 'ADD',
+            })
+            this.doubleShot = this.physics.add.sprite(600, 400, 'item').setVelocity(150, 200).setCollideWorldBounds(true, 1, 1, true).setScale();
+            this.doubleShotParticles.startFollow(this.doubleShot);
+        }
+    }
+    
+    obtenerDoubleShot(){
+        console.log('double shot agarrado');
+        this.doubleShot.destroy();
+        this.doubleShotParticles.destroy();
+        this.disparoDoble=true;
+        this.time.addEvent({
+            delay: 7000,
+            callback: () => {
+                this.disparoDoble = false;
+            },
+            callbackScope: this,
+            repeat:0 
+        })
     }
 }
 export default Nivel3;
